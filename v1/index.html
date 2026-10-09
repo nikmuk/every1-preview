@@ -1,0 +1,1125 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EVERY1 Aura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a phone-shaped app, dark by design, framed on wide screens and
+   full-bleed on phones. One idea carries the look: every person has a living
+   "aura" built from four warm-to-cool hues, and the same hues light up
+   whatever you've noticed about them. Floating glass nav, bento home,
+   swipeable cards, sheets that slide up. Deliberately single-theme. */
+:root {
+  --bg: #0d0a12;
+  --bg-2: #15101c;
+  --card: rgba(255, 255, 255, 0.055);
+  --card-hi: rgba(255, 255, 255, 0.09);
+  --line: rgba(255, 255, 255, 0.1);
+  --text: #f7f3fb;
+  --muted: #bcb3c9;
+  --faint: #857c93;
+  --peach: #ff9e7a;
+  --pink: #ff5c9a;
+  --lilac: #b79cff;
+  --mint: #6ff2c9;
+  --sun: #ffd66b;
+  --warn: #ffb35c;
+
+  --aura: radial-gradient(circle at 30% 30%, var(--peach), transparent 55%),
+          radial-gradient(circle at 75% 35%, var(--pink), transparent 55%),
+          radial-gradient(circle at 40% 80%, var(--lilac), transparent 60%),
+          radial-gradient(circle at 80% 80%, var(--mint), transparent 55%);
+
+  --display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --body: 'Figtree', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --r: 22px;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--body); line-height: 1.45; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+input, textarea { font: inherit; color: var(--text); }
+:focus-visible { outline: 2px solid var(--lilac); outline-offset: 2px; border-radius: 10px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; letter-spacing: -0.02em; line-height: 1.02; text-wrap: balance; }
+p { margin: 0; }
+
+/* The phone frame */
+.stage { min-height: 100%; display: grid; place-items: start center; padding-block: 0; padding-inline: 0; }
+@media (min-width: 520px) { .stage { padding-block: 28px; padding-inline: 16px; background: radial-gradient(60% 50% at 50% 0%, #22152e 0%, var(--bg) 70%); } }
+.phone { position: relative; width: 100%; max-width: 420px; min-height: 100vh; background: var(--bg); overflow: hidden; overflow: clip; isolation: isolate; }
+@media (min-width: 520px) { .phone { min-height: 860px; height: 860px; border-radius: 44px; border: 1px solid var(--line); box-shadow: 0 40px 120px rgba(0,0,0,0.6), 0 0 0 10px #050308; } }
+.phone::before { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 30; opacity: 0.07;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+.topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 42; display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: 8px;
+  padding: 10px 12px 8px; background: linear-gradient(var(--bg) 60%, rgba(13,10,18,0)); }
+.topbar button { width: 40px; height: 40px; border-radius: 14px; display: grid; place-items: center; background: rgba(24,18,32,0.72);
+  border: 1px solid var(--line); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); font-size: 1.25rem; font-weight: 800; color: var(--text); text-align: center; transition: transform .12s, opacity .15s; }
+.topbar button:active { transform: scale(0.9); }
+.topbar button:disabled { opacity: 0.28; cursor: default; }
+.topbar .ttl { text-align: center; font-family: var(--display); font-weight: 700; font-size: 1rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.scroll { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; padding-inline: 18px; padding-block: 70px 120px; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+#view { position: relative; overflow-x: clip; margin-inline: -18px; padding-inline: 18px; }
+.glow { position: absolute; width: 380px; height: 380px; border-radius: 50%; filter: blur(70px); opacity: 0.35; z-index: -1; pointer-events: none; background: var(--aura); }
+
+/* Glass nav */
+.nav { position: absolute; left: 14px; right: 14px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 20; display: grid; grid-template-columns: repeat(5, 1fr); align-items: center;
+  background: rgba(24, 18, 32, 0.72); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); border: 1px solid var(--line); border-radius: 28px; padding: 8px 6px; }
+.nav button { display: grid; place-items: center; gap: 2px; font-size: 0.68rem; color: var(--faint); padding: 4px 0; font-weight: 600; }
+.nav button svg { width: 22px; height: 22px; }
+.nav button[aria-current="page"] { color: var(--text); }
+.nav .plus { width: 52px; height: 52px; margin: -20px auto 0; border-radius: 18px; background: var(--aura), #2a1d3a; color: #160f1d; font-size: 1.8rem; font-weight: 800; box-shadow: 0 10px 30px rgba(255, 92, 154, 0.35); transition: transform 0.15s; }
+.nav .plus:active { transform: scale(0.92) rotate(-6deg); }
+
+/* Type + text helpers */
+.eyebrow { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); font-weight: 700; }
+.muted { color: var(--muted); }
+.faint { color: var(--faint); font-size: 0.82rem; }
+.big { font-size: 2.4rem; }
+.huge { font-size: 3.4rem; }
+.grad-text { background: linear-gradient(90deg, var(--peach), var(--pink), var(--lilac)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+.col { display: flex; flex-direction: column; gap: 12px; }
+.col-sm { display: flex; flex-direction: column; gap: 6px; }
+.row { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.between { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.grow { flex: 1; min-width: 0; }
+
+/* Cards */
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; position: relative; overflow: hidden; }
+.tap { transition: transform 0.15s ease, background 0.15s; }
+.tap:active { transform: scale(0.97); }
+.tap:hover { background: var(--card-hi); }
+.bento { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.bento .wide { grid-column: span 2; }
+.card.aura-card { background: linear-gradient(160deg, rgba(255,158,122,0.22), rgba(183,156,255,0.16) 60%, rgba(111,242,201,0.14)); border-color: rgba(255,255,255,0.16); }
+
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+.pill.hot { background: rgba(255, 92, 154, 0.16); border-color: rgba(255, 92, 154, 0.4); color: #ffc2d8; }
+.pill.mint { background: rgba(111, 242, 201, 0.12); border-color: rgba(111, 242, 201, 0.35); color: #b6fbe6; }
+.pill.lock { background: rgba(183, 156, 255, 0.12); border-color: rgba(183, 156, 255, 0.35); color: #ddd1ff; }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.btn { display: block; width: 100%; text-align: center; padding: 15px 18px; border-radius: 18px; font-weight: 700; font-size: 1rem; color: #170f1e;
+  background: linear-gradient(95deg, var(--peach), var(--pink) 55%, var(--lilac)); box-shadow: 0 10px 30px rgba(255, 92, 154, 0.28); transition: transform 0.15s; }
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.35; box-shadow: none; }
+.btn-ghost { display: block; width: 100%; text-align: center; padding: 13px 18px; border-radius: 18px; font-weight: 700; background: var(--card); border: 1px solid var(--line); }
+.chip { padding: 9px 14px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-weight: 600; font-size: 0.88rem; transition: transform 0.12s, background 0.12s; }
+.chip:active { transform: scale(0.94); }
+.chip[aria-pressed="true"] { background: var(--text); color: #170f1e; border-color: var(--text); }
+
+/* Aura avatars */
+.ava { position: relative; width: 58px; height: 58px; border-radius: 50%; flex: none; display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 1.3rem; color: #170f1e; }
+.ava { background: #1b1424; overflow: hidden; }
+.ava canvas { width: 100%; height: 100%; display: block; }
+.ava .blob { position: absolute; inset: 0; border-radius: 50%; background: var(--aura), #3a2a4a; animation: spin 14s linear infinite; }
+.ava span { position: relative; }
+.ring { position: relative; padding: 3px; border-radius: 50%; background: conic-gradient(var(--peach), var(--pink), var(--lilac), var(--mint), var(--peach)); }
+.ring.dim { background: var(--line); }
+.ring > .ava { border: 3px solid var(--bg); }
+.badge { position: absolute; right: -2px; bottom: -2px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 0.7rem; background: var(--bg-2); border: 1px solid var(--line); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.stories { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px; margin-inline: -18px; padding-inline: 18px; scrollbar-width: none; }
+.stories::-webkit-scrollbar { display: none; }
+.story { display: grid; justify-items: center; gap: 6px; font-size: 0.74rem; font-weight: 600; color: var(--muted); flex: none; }
+.story .add { width: 64px; height: 64px; border-radius: 50%; border: 2px dashed var(--line); display: grid; place-items: center; font-size: 1.5rem; color: var(--faint); }
+
+/* The aura orb on a person page */
+.orb-wrap { position: relative; width: 300px; max-width: 100%; aspect-ratio: 1; margin: 0 auto; }
+.orb { position: absolute; inset: 30%; border-radius: 50%; background: var(--aura), #2b1f38; filter: saturate(1.2); animation: breathe 6s ease-in-out infinite, spin 30s linear infinite; box-shadow: 0 0 80px rgba(255, 92, 154, 0.35); }
+.orb-init { position: absolute; inset: 30%; display: grid; place-items: center; font-family: var(--display); font-size: 3.2rem; font-weight: 800; color: #170f1e; }
+@keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+.orb-ring { position: absolute; inset: 0; width: 100%; height: 100%; }
+.orb-ring .seg { fill: none; stroke-width: 15; stroke-linecap: round; cursor: pointer; transition: stroke-width 0.15s; }
+.orb-ring .seg:hover { stroke-width: 19; }
+.orb-ring .off { stroke: rgba(255,255,255,0.08); stroke-dasharray: 3 7; stroke-width: 10; }
+.orb-ring .hit { fill: transparent; cursor: pointer; }
+.orb-ring text { fill: var(--muted); font-family: var(--body); font-size: 10.5px; font-weight: 700; pointer-events: none; }
+.orb-ring text.off-t { fill: var(--faint); font-weight: 500; }
+
+.tabs { display: flex; gap: 6px; padding: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; }
+.tabs button { flex: 1; text-align: center; padding: 9px 4px; border-radius: 999px; font-weight: 700; font-size: 0.84rem; color: var(--faint); }
+.tabs button[aria-current="true"] { background: var(--text); color: #170f1e; }
+
+.hscroll { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; margin-inline: -18px; padding-inline: 18px; padding-bottom: 6px; scrollbar-width: none; }
+.hscroll::-webkit-scrollbar { display: none; }
+.hscroll > * { scroll-snap-align: start; flex: none; width: 78%; }
+
+.note { display: grid; grid-template-columns: 36px 1fr; gap: 10px; }
+.note .em { width: 36px; height: 36px; border-radius: 12px; background: var(--card-hi); display: grid; place-items: center; font-size: 1.05rem; }
+.note + .note { border-top: 1px solid var(--line); padding-top: 12px; }
+.read { font-style: italic; color: var(--lilac); font-size: 0.9rem; }
+
+.sticker { border-radius: 18px; padding: 12px 14px; font-weight: 600; font-size: 0.92rem; transform: rotate(-0.6deg); }
+.sticker.warn { background: rgba(255, 179, 92, 0.14); border: 1px solid rgba(255, 179, 92, 0.45); color: #ffd9a8; }
+.sticker.stop { background: rgba(255, 92, 154, 0.14); border: 1px solid rgba(255, 92, 154, 0.5); color: #ffc2d8; transform: rotate(0.6deg); }
+.sticker.cool { background: rgba(111, 242, 201, 0.1); border: 1px solid rgba(111, 242, 201, 0.4); color: #c3fbea; }
+
+.field { width: 100%; padding: 14px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); font-size: 1rem; }
+textarea.field { min-height: 110px; resize: none; line-height: 1.4; }
+.field::placeholder { color: var(--faint); }
+
+/* Sheets */
+.sheet-back { position: absolute; inset: 0; background: rgba(5, 3, 8, 0.6); z-index: 40; animation: fade 0.2s ease; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 88%; overflow-y: auto; z-index: 41; background: var(--bg-2); border-top: 1px solid var(--line); border-radius: 30px 30px 0 0; padding-inline: 18px; padding-block: 10px 30px; animation: up 0.28s cubic-bezier(.2,.9,.3,1.1); scrollbar-width: none; }
+.sheet::-webkit-scrollbar { display: none; }
+.grab { width: 44px; height: 5px; border-radius: 999px; background: var(--line); margin: 4px auto 14px; }
+@keyframes up { from { transform: translateY(100%); } }
+@keyframes fade { from { opacity: 0; } }
+
+/* Onboarding stories */
+.ob { position: absolute; inset: 0; z-index: 50; background: var(--bg); display: flex; flex-direction: column; padding-inline: 20px; padding-block: 16px 30px; }
+.ob .bars { display: flex; gap: 4px; }
+.ob .bars i { flex: 1; height: 3px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.ob .bars i b { display: block; height: 100%; width: 0; background: var(--text); }
+.ob .bars i.done b { width: 100%; }
+.ob .bars i.now b { animation: bar 5s linear forwards; }
+@keyframes bar { to { width: 100%; } }
+.ob .stage-art { flex: 1; display: grid; place-items: center; position: relative; }
+.ob .tapzone { position: absolute; inset: 60px 0 160px; display: grid; grid-template-columns: 1fr 2fr; z-index: 2; }
+
+/* Swipe game */
+.deck { position: relative; height: 430px; }
+.gcard { position: absolute; inset: 0; border-radius: 30px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; touch-action: none; user-select: none;
+  background: linear-gradient(165deg, #2a1d3a, #1a1324); border: 1px solid rgba(255,255,255,0.14); box-shadow: 0 30px 60px rgba(0,0,0,0.45); transition: transform 0.35s cubic-bezier(.2,.9,.3,1.2), opacity 0.3s; }
+.gcard.behind { transform: scale(0.94) translateY(16px); opacity: 0.6; }
+.gcard .opt { display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center; padding: 12px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); font-weight: 700; }
+.gcard .opt .e { font-size: 1.7rem; text-align: center; }
+.gcard .hint-l, .gcard .hint-r { position: absolute; top: 22px; padding: 6px 12px; border-radius: 12px; font-weight: 800; font-family: var(--display); font-size: 1.1rem; opacity: 0; transition: opacity 0.1s; }
+.gcard .hint-l { left: 20px; border: 2px solid var(--peach); color: var(--peach); transform: rotate(-10deg); }
+.gcard .hint-r { right: 20px; border: 2px solid var(--mint); color: var(--mint); transform: rotate(10deg); }
+.progress { display: flex; gap: 5px; }
+.progress i { flex: 1; height: 5px; border-radius: 5px; background: var(--line); }
+.progress i.on { background: linear-gradient(90deg, var(--peach), var(--pink)); }
+
+/* Share card */
+.share { aspect-ratio: 9 / 14; border-radius: 30px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;
+  background: linear-gradient(160deg, #ff9e7a 0%, #ff5c9a 38%, #b79cff 72%, #6ff2c9 110%); color: #170f1e; box-shadow: 0 30px 80px rgba(255, 92, 154, 0.35); }
+.share .blob2 { position: absolute; width: 260px; height: 260px; border-radius: 50%; right: -80px; top: 90px; background: rgba(255,255,255,0.25); filter: blur(10px); }
+.share h2 { font-size: 3rem; position: relative; }
+.share .meter { display: flex; gap: 6px; position: relative; }
+.share .meter i { flex: 1; height: 14px; border-radius: 8px; background: rgba(23,15,30,0.18); }
+.share .meter i.on { background: #170f1e; }
+
+.toast { position: absolute; left: 50%; bottom: 100px; transform: translateX(-50%); z-index: 60; background: var(--text); color: #170f1e; font-weight: 700; padding: 10px 16px; border-radius: 16px; font-size: 0.9rem; width: max-content; max-width: calc(100% - 36px); animation: pop 0.25s cubic-bezier(.2,.9,.3,1.4); }
+@keyframes pop { from { transform: translateX(-50%) scale(0.8); opacity: 0; } }
+canvas.confetti { position: absolute; inset: 0; pointer-events: none; z-index: 55; }
+
+.pop-in { animation: popin 0.4s cubic-bezier(.2,.9,.3,1.3) both; }
+@keyframes popin { from { transform: scale(0.85) translateY(10px); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="stage">
+  <div class="phone" id="phone">
+    <div class="topbar" id="topbar">
+      <button id="hback" data-act="hback" aria-label="Back" title="Back">←</button>
+      <span class="ttl" id="httl"></span>
+      <button id="hfwd" data-act="hfwd" aria-label="Forward" title="Forward">→</button>
+    </div>
+    <div class="scroll" id="scroll"><div id="view"></div></div>
+    <nav class="nav" id="nav" aria-label="Main">
+      <button data-nav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+      <button data-nav="people"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 20c0-2.4 1.6-4.4 4-4.9"/></svg>People</button>
+      <button class="plus" data-act="note" aria-label="Add a note">+</button>
+      <button data-nav="guess"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="5" y="3" width="11" height="15" rx="3" transform="rotate(-8 10 10)"/><rect x="9" y="6" width="11" height="15" rx="3" transform="rotate(8 14 13)"/></svg>Guess</button>
+      <button data-nav="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>Me</button>
+    </nav>
+    <div id="layer"></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  /* ------------------------------------------------------------------
+   * Sample data (fictional).
+   * ---------------------------------------------------------------- */
+  const DOMAINS = [
+    { k: 'comm', l: 'Talk', full: 'How they talk' },
+    { k: 'conflict', l: 'Clashes', full: 'Disagreements & making up' },
+    { k: 'support', l: 'Bad days', full: 'What helps on bad days' },
+    { k: 'plans', l: 'Plans', full: 'Plans & decisions' },
+    { k: 'feedback', l: 'Feedback', full: 'Feedback & credit' },
+    { k: 'social', l: 'Social', full: 'Social energy' },
+    { k: 'space', l: 'Space', full: 'Boundaries & space' }
+  ];
+  const SRC = {
+    saw: { e: '👀', l: 'Saw it' },
+    said: { e: '💬', l: 'They said' },
+    shared: { e: '✨', l: 'They shared' },
+    tried: { e: '🎯', l: 'Tried it' }
+  };
+  const BAND = {
+    hunch: { e: '🌱', l: 'Hunch' },
+    working: { e: '🌿', l: 'Getting there' },
+    solid: { e: '🌳', l: 'Solid' },
+    mixed: { e: '🌗', l: 'Mixed signals' }
+  };
+
+  const PEOPLE = [
+    { id: 'sam', n: 'Sam', ctx: 'Best friend', joined: true, fresh: true,
+      notes: [
+        { d: 'support', s: 'saw', t: 'After his interview went badly he wanted a long walk, not a chat about it.', w: 'Sep 19' },
+        { d: 'support', s: 'shared', t: '"I need an hour alone first. Then I\'m glad you\'re around."', w: 'Round 3' },
+        { d: 'plans', s: 'saw', t: 'Changed our Saturday plan three times and was happy every time.', w: 'Sep 27' },
+        { d: 'conflict', s: 'said', t: 'Told me he hates going to sleep on an argument.', w: 'Sep 12' },
+        { d: 'social', s: 'shared', t: '"Small groups over big parties, always."', w: 'Round 2' },
+        { d: 'space', s: 'said', t: 'Said Sunday mornings are his no-plans time.', w: 'Aug 30' }
+      ],
+      pats: [{ d: 'support', b: 'working', t: 'Bad day → wants company, not conversation', why: '2 times · his own answer adds: alone time first' }],
+      asks: []
+    },
+    { id: 'maya', n: 'Maya', ctx: 'Colleague', locked: true,
+      notes: [
+        { d: 'comm', s: 'saw', t: 'Asked me twice for "the headline" while I walked through the numbers.', w: 'Oct 5', read: 'Felt impatient with me' },
+        { d: 'comm', s: 'said', t: 'Told me she\'d rather get a quick call than a long message.', w: 'Sep 24' },
+        { d: 'comm', s: 'tried', t: 'Led with the conclusion in our 1:1. Fastest meeting ever, great questions.', w: 'Oct 2' },
+        { d: 'conflict', s: 'saw', t: 'Disagreed in the meeting, then DM\'d me after to talk it through.', w: 'Sep 15' },
+        { d: 'conflict', s: 'saw', t: 'Pushed back on the vendor choice instantly, in front of everyone.', w: 'Sep 30', off: true },
+        { d: 'plans', s: 'saw', t: 'Deadline moved up last minute. She went quiet all afternoon.', w: 'Oct 1' },
+        { d: 'feedback', s: 'saw', t: 'Looked awkward when the director thanked her in front of the team.', w: 'Sep 21' }
+      ],
+      pats: [
+        { d: 'comm', b: 'working', t: 'Work updates → headline first, details after', why: 'Seen 3 times · you tried it and it worked' },
+        { d: 'conflict', b: 'mixed', t: 'Disagrees later, one-to-one', why: '1 for · 1 that doesn\'t fit' },
+        { d: 'plans', b: 'hunch', t: 'Last-minute changes hit her hard', why: 'Just once so far' },
+        { d: 'feedback', b: 'hunch', t: 'Prefers private thanks over public shout-outs', why: 'Just once so far' }
+      ],
+      asks: [
+        { q: 'How does she like hearing about changes?', msg: 'Hey, quick one: if plans change, do you want to hear straight away, or once it\'s settled?' },
+        { q: 'How does she like getting feedback?', msg: 'When you\'ve got feedback for me, how do you like to give it? And how do you like getting it?' }
+      ],
+      stop: true
+    },
+    { id: 'mum', n: 'Mum', ctx: 'Family', locked: true,
+      notes: [
+        { d: 'support', s: 'said', t: 'Said she just wants me to listen, not fix things.', w: 'Sep 26' },
+        { d: 'comm', s: 'tried', t: 'Just listened when she talked about the house. She thanked me twice.', w: 'Oct 4' },
+        { d: 'social', s: 'saw', t: 'Calls every Sunday around seven.', w: 'Oct 4' }
+      ],
+      pats: [{ d: 'comm', b: 'solid', t: 'Sharing a problem → wants listening first', why: 'Checked twice: she said it, and it worked' }],
+      asks: []
+    },
+    { id: 'dev', n: 'Dev', ctx: 'Manager', locked: true, lopsided: true,
+      notes: [
+        { d: 'plans', s: 'saw', t: 'Changed the project scope in the all-hands without telling me.', w: 'a while ago', bad: true },
+        { d: 'comm', s: 'saw', t: 'Replied "ok" to my two-page plan.', w: 'Sep 25', read: 'He hated it?', bad: true },
+        { d: 'plans', s: 'saw', t: 'Took three weeks to approve the hire.', w: 'a while ago', bad: true },
+        { d: 'feedback', s: 'saw', t: 'Got defensive when I raised the timeline in front of his boss.', w: 'Sep 22', bad: true },
+        { d: 'comm', s: 'saw', t: 'Answered my chat message in two minutes.', w: 'Oct 5' }
+      ],
+      pats: [{ d: 'comm', b: 'hunch', t: 'One-word reply = annoyed?', why: 'Once, and it\'s your read. Could just mean "yes".' }],
+      asks: []
+    }
+  ];
+  const P = id => PEOPLE.find(p => p.id === id);
+
+  /* Sam's own answers about himself; you guess them. */
+  const GAME = [
+    { q: 'Worst day ever. Sam wants…', a: ['🫂', 'Company, right now'], b: ['🎧', 'Alone time first'], sam: 'b', dom: 'Bad days' },
+    { q: 'You cancel last minute. Sam is…', a: ['😌', 'Totally fine'], b: ['😶', 'Low-key hurt'], sam: 'a', dom: 'Plans' },
+    { q: 'Saturday plans?', a: ['🗓️', 'Booked & sorted'], b: ['🌊', 'Vibes, figure it out'], sam: 'b', dom: 'Plans' },
+    { q: 'Hard feedback. Sam wants it…', a: ['🍬', 'Sugar-coated first'], b: ['🎯', 'Straight up'], sam: 'b', dom: 'Feedback' },
+    { q: 'After a fight, Sam…', a: ['📱', 'Texts first (with a meme)'], b: ['⏳', 'Waits it out'], sam: 'a', dom: 'Clashes' }
+  ];
+
+  const DROP = { q: 'Catching up: a 2-hour call or a 2-minute voice note?', a: ['📞', '2-hour call'], b: ['🎙️', '2-min voice note'],
+    side: 'Your Side' };
+  /* One-tap moments (blueprint v0.3 §33.3): each describes something someone DID. */
+  const MOMENTS = [
+    ['🤐', 'Went quiet', 'conflict', 'saw'], ['💬', 'Short reply', 'comm', 'saw'], ['📅', 'Cancelled', 'plans', 'saw'],
+    ['🗓️', 'Made a plan', 'plans', 'saw'], ['🫶', 'Opened up', 'support', 'said'], ['🌧️', 'Wanted space', 'support', 'saw'],
+    ['🛠️', 'Helped me', 'support', 'saw'], ['⚡', 'We clashed', 'conflict', 'saw'], ['👋', 'Reached out', 'social', 'saw'],
+    ['📣', 'Gave feedback', 'feedback', 'saw'], ['🎧', 'Took feedback', 'feedback', 'saw'], ['🛡️', 'Said no', 'space', 'saw']
+  ];
+
+  /* ------------------------------------------------------------------
+   * State.
+   * ---------------------------------------------------------------- */
+  const S = { view: 'home', pid: null, tab: 'aura', ob: 0, obDone: false, drop: null, game: { i: 0, picks: [] }, note: null, sheet: null, myCard: ['b', 'b', 'a'] };
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  function toast(msg) {
+    const old = document.querySelector('.toast'); if (old) old.remove();
+    const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+    $('phone').appendChild(t); setTimeout(() => t.remove(), 2400);
+  }
+
+  const ava = (p, size = 58, ring = 'dim', badge = '') =>
+    '<div class="ring ' + ring + '"><div class="ava" style="width:' + size + 'px;height:' + size + 'px"><canvas class="pcv" data-pid="' + esc(p.id) + '" data-size="' + size + '" aria-hidden="true"></canvas></div>' + (badge ? '<span class="badge">' + badge + '</span>' : '') + '</div>';
+
+  /* ------------------------------------------------------------------
+   * Living portraits.
+   *
+   * Each person gets a surreal character that evolves through three
+   * stages: a wireframe sketch, a pixel version, then a vivid animated
+   * one. Two rules keep it honest:
+   *   1. Features come from WHICH AREAS you've noticed things in, never
+   *      from what you concluded. No feature is good or bad, and nothing
+   *      here predicts what anyone looks like.
+   *   2. It sharpens with CHECKED things — what they told you, shared,
+   *      or what happened when you tried something — not with note count.
+   * Shape and colours are seeded from the person's id, so they're stable
+   * and arbitrary: they say nothing about the person.
+   * ---------------------------------------------------------------- */
+  const PAL = ['#ff9e7a', '#ff5c9a', '#b79cff', '#6ff2c9', '#ffd66b'];
+  const STAGES = [null, { k: 'Sketch', e: '✏️' }, { k: 'Pixel', e: '👾' }, { k: 'Vivid', e: '🌈' }];
+  const REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function hashStr(s) { let h = 2166136261 >>> 0; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; } return h; }
+  function mulberry(a) { return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+  function specFor(p) {
+    const r = mulberry(hashStr(p.id || p.n));
+    const counts = {};
+    (p.notes || []).forEach(x => { counts[x.d] = (counts[x.d] || 0) + 1; });
+    const checked = (p.notes || []).filter(x => x.s !== 'saw').length;
+    const i1 = Math.floor(r() * 5), i2 = (i1 + 1 + Math.floor(r() * 3)) % 5;
+    return {
+      r0: r(), w: 0.5 + r() * 0.12, h: 0.6 + r() * 0.1, n: 2.2 + r() * 1.6, eyeGap: 0.13 + r() * 0.05, eyeR: 0.055 + r() * 0.02,
+      tilt: (r() - 0.5) * 0.14, c1: PAL[i1], c2: PAL[i2], c3: PAL[(i2 + 2) % 5], counts, checked,
+      stage: checked >= 4 ? 3 : checked >= 2 ? 2 : 1
+    };
+  }
+
+  function headPath(ctx, cx, cy, rw, rh, n, tilt) {
+    ctx.beginPath();
+    for (let i = 0; i <= 72; i++) {
+      const a = (i / 72) * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a);
+      const x = Math.sign(ca) * Math.pow(Math.abs(ca), 2 / n) * rw, y = Math.sign(sa) * Math.pow(Math.abs(sa), 2 / n) * rh;
+      const xr = x * Math.cos(tilt) - y * Math.sin(tilt), yr = x * Math.sin(tilt) + y * Math.cos(tilt);
+      if (i) ctx.lineTo(cx + xr, cy + yr); else ctx.moveTo(cx + xr, cy + yr);
+    }
+    ctx.closePath();
+  }
+
+  function drawFigure(ctx, S, sp, t, mode) {
+    const sketch = mode === 'sketch';
+    const cx = S / 2, cy = S * 0.56, rw = (S * sp.w) / 2, rh = (S * sp.h) / 2;
+    const has = k => (sp.counts[k] || 0) > 0;
+    const ink = 'rgba(247,243,251,0.88)', ghost = 'rgba(247,243,251,0.22)';
+    const lw = Math.max(1, S / 110);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = lw; ctx.setLineDash([]);
+    const fill = c => { if (sketch) { ctx.strokeStyle = ink; ctx.lineWidth = lw; ctx.stroke(); } else { ctx.fillStyle = c; ctx.fill(); } };
+
+    if (sketch) {
+      // Construction lines: the "wireframe" look.
+      ctx.save(); ctx.setLineDash([S / 55, S / 40]); ctx.strokeStyle = ghost; ctx.lineWidth = Math.max(0.6, S / 220);
+      ctx.beginPath(); ctx.moveTo(cx, S * 0.06); ctx.lineTo(cx, S * 0.96); ctx.moveTo(S * 0.06, cy); ctx.lineTo(S * 0.94, cy);
+      ctx.moveTo(S * 0.12, cy - rh * 0.14); ctx.lineTo(S * 0.88, cy - rh * 0.14); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx, cy, Math.max(rw, rh) * 1.16, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+    }
+
+    // Space → an outer boundary ring.
+    if (has('space')) {
+      ctx.save(); ctx.setLineDash([S / 28, S / 45]); ctx.lineDashOffset = -t * S * 0.08;
+      ctx.beginPath(); ctx.ellipse(cx, cy, rw * 1.36, rh * 1.22, 0, 0, Math.PI * 2);
+      ctx.lineWidth = Math.max(1, S / 85); ctx.strokeStyle = sketch ? ink : sp.c3; ctx.stroke(); ctx.restore();
+    }
+
+    // Plans → an orbit with moons.
+    if (has('plans')) {
+      const k = Math.min(4, sp.counts.plans + 1), oy = cy + rh * 0.12, rot = -0.28;
+      ctx.save(); ctx.beginPath(); ctx.ellipse(cx, oy, rw * 1.5, rh * 0.4, rot, 0, Math.PI * 2);
+      ctx.lineWidth = Math.max(0.8, S / 170); ctx.strokeStyle = sketch ? ghost : 'rgba(255,255,255,0.28)'; ctx.stroke();
+      for (let i = 0; i < k; i++) {
+        const a = t * 0.6 + (i * Math.PI * 2) / k;
+        const ex = Math.cos(a) * rw * 1.5, ey = Math.sin(a) * rh * 0.4;
+        const x = cx + ex * Math.cos(rot) - ey * Math.sin(rot), y = oy + ex * Math.sin(rot) + ey * Math.cos(rot);
+        ctx.beginPath(); ctx.arc(x, y, S * 0.024, 0, Math.PI * 2); fill(PAL[(i + 2) % 5]);
+      }
+      ctx.restore();
+    }
+
+    // Bad days → a small floating cloud.
+    if (has('support')) {
+      const fy = cy - rh * 1.2 + Math.sin(t * 1.2) * S * 0.012;
+      ctx.beginPath();
+      [[-0.1, 0, 0.062], [0, -0.028, 0.08], [0.1, 0, 0.062]].forEach(([dx, dy, r]) => {
+        ctx.moveTo(cx + dx * S + r * S, fy + dy * S); ctx.arc(cx + dx * S, fy + dy * S, r * S, 0, Math.PI * 2);
+      });
+      fill('rgba(255,214,107,0.92)');
+    }
+
+    // Feedback → an antenna with a glowing tip.
+    if (has('feedback')) {
+      const bx = cx + rw * 0.3, by = cy - rh * 0.93, tx = bx + S * 0.1, ty = by - S * 0.15 + Math.sin(t * 2) * S * 0.01;
+      ctx.beginPath(); ctx.moveTo(bx, by); ctx.quadraticCurveTo(bx + S * 0.06, by - S * 0.1, tx, ty);
+      ctx.lineWidth = Math.max(1, S / 90); ctx.strokeStyle = sketch ? ink : 'rgba(255,255,255,0.75)'; ctx.stroke();
+      ctx.beginPath(); ctx.arc(tx, ty, S * 0.03, 0, Math.PI * 2);
+      if (!sketch) { ctx.shadowColor = sp.c2; ctx.shadowBlur = S * 0.08; }
+      fill(sp.c2); ctx.shadowBlur = 0;
+    }
+
+    // The head.
+    headPath(ctx, cx, cy, rw, rh, sp.n, sp.tilt);
+    if (sketch) { ctx.strokeStyle = ink; ctx.lineWidth = Math.max(1.2, S / 75); ctx.stroke(); }
+    else {
+      const g = ctx.createRadialGradient(cx - rw * 0.35, cy - rh * 0.4, S * 0.02, cx, cy, Math.max(rw, rh) * 1.25);
+      g.addColorStop(0, '#fff6ee'); g.addColorStop(0.28, sp.c1); g.addColorStop(1, sp.c2);
+      ctx.fillStyle = g; ctx.fill();
+    }
+
+    // Clashes → the face splits into two tones along a wavy seam.
+    if (has('conflict')) {
+      ctx.save(); headPath(ctx, cx, cy, rw, rh, sp.n, sp.tilt); ctx.clip();
+      ctx.beginPath(); ctx.moveTo(cx, cy - rh * 1.3);
+      for (let y = -1.3; y <= 1.3; y += 0.08) ctx.lineTo(cx + Math.sin(y * 6 + t) * S * 0.016, cy + y * rh);
+      if (sketch) { ctx.strokeStyle = ink; ctx.lineWidth = lw; ctx.stroke(); }
+      else { ctx.lineTo(cx + rw * 1.6, cy + rh * 1.3); ctx.lineTo(cx + rw * 1.6, cy - rh * 1.3); ctx.closePath(); ctx.globalAlpha = 0.55; ctx.fillStyle = sp.c3; ctx.fill(); }
+      ctx.restore();
+    }
+
+    // Eyes, which drift around slowly.
+    const ey = cy - rh * 0.14, gap = S * sp.eyeGap, er = S * sp.eyeR;
+    [-1, 1].forEach(sd => {
+      const ex = cx + sd * gap;
+      ctx.beginPath(); ctx.arc(ex, ey, er, 0, Math.PI * 2); fill('#fbf8ff');
+      const lx = Math.cos(t * 0.7 + sp.r0 * 6) * er * 0.35, ly = Math.sin(t * 0.9) * er * 0.25;
+      ctx.beginPath(); ctx.arc(ex + lx, ey + ly, er * 0.45, 0, Math.PI * 2);
+      if (sketch) { ctx.strokeStyle = ink; ctx.stroke(); } else { ctx.fillStyle = '#170f1e'; ctx.fill(); }
+    });
+
+    // Social energy → a third eye and drifting bubbles.
+    if (has('social')) {
+      const ex = cx, eyy = cy - rh * 0.52;
+      ctx.beginPath(); ctx.ellipse(ex, eyy, er * 0.85, er * 0.55, 0, 0, Math.PI * 2); fill('#fbf8ff');
+      ctx.beginPath(); ctx.arc(ex, eyy, er * 0.3, 0, Math.PI * 2);
+      if (sketch) { ctx.strokeStyle = ink; ctx.stroke(); } else { ctx.fillStyle = sp.c3; ctx.fill(); }
+      for (let i = 0; i < 3; i++) {
+        const a = t * 0.4 + i * 2.1;
+        ctx.beginPath(); ctx.arc(cx + Math.cos(a) * rw * 1.18, cy - rh * 0.2 + Math.sin(a) * rh * 0.9, S * (0.012 + i * 0.004), 0, Math.PI * 2);
+        fill('rgba(255,255,255,0.7)');
+      }
+    }
+
+    // Mouth, neutral on purpose; Talk → sound waves.
+    const my = cy + rh * 0.4;
+    ctx.beginPath(); ctx.ellipse(cx, my, S * 0.034, S * 0.016, 0, 0, Math.PI * 2);
+    if (sketch) { ctx.strokeStyle = ink; ctx.lineWidth = lw; ctx.stroke(); } else { ctx.fillStyle = '#170f1e'; ctx.fill(); }
+    if (has('comm')) {
+      const k = Math.min(4, sp.counts.comm + 1);
+      for (let i = 1; i <= k; i++) {
+        const rr = S * (0.045 + i * 0.034) + ((t * S * 0.03) % (S * 0.034));
+        ctx.beginPath(); ctx.arc(cx + S * 0.035, my, rr, -0.5, 0.5);
+        ctx.lineWidth = Math.max(1, S / 120); ctx.strokeStyle = sketch ? ink : 'rgba(255,255,255,' + (0.8 - i * 0.15) + ')'; ctx.stroke();
+      }
+    }
+  }
+
+  let OFF;
+  function paint(cv, sp, t) {
+    const dpr = Math.min(2, window.devicePixelRatio || 1), css = +cv.dataset.size || 58, px = Math.round(css * dpr);
+    if (cv.width !== px) { cv.width = px; cv.height = px; }
+    // Display size comes from data-size unless the layout already set one.
+    if (!cv.style.width) { cv.style.width = css + 'px'; cv.style.height = css + 'px'; }
+    const ctx = cv.getContext('2d'), S = cv.width;
+    ctx.clearRect(0, 0, S, S);
+    let stage = +(cv.dataset.stage || sp.stage);
+    if (cv.dataset.cycle) stage = 1 + (Math.floor(t / 1.8) % 3);
+    const res = cv._res;
+    if (stage === 1 && !res) { drawFigure(ctx, S, sp, t * 0.6, 'sketch'); return; }
+    if (stage === 2 || res) {
+      const R = res || 30;
+      OFF = OFF || document.createElement('canvas');
+      OFF.width = R; OFF.height = R;
+      const o = OFF.getContext('2d'); o.clearRect(0, 0, R, R); drawFigure(o, R, sp, t, 'color');
+      ctx.imageSmoothingEnabled = false; ctx.drawImage(OFF, 0, 0, R, R, 0, 0, S, S);
+      if (!res) {
+        // A faint pixel grid, laid only over the drawn pixels.
+        ctx.save(); ctx.globalCompositeOperation = 'source-atop'; ctx.strokeStyle = 'rgba(13,10,18,0.32)'; ctx.lineWidth = 1; ctx.beginPath();
+        for (let i = 1; i < R; i++) { const q = Math.round((i * S) / R) + 0.5; ctx.moveTo(q, 0); ctx.lineTo(q, S); ctx.moveTo(0, q); ctx.lineTo(S, q); }
+        ctx.stroke(); ctx.restore();
+      }
+      return;
+    }
+    drawFigure(ctx, S, sp, t, 'color');
+  }
+
+  const SELF = {
+    alex: { id: 'alex', n: 'Alex', notes: ['support', 'plans', 'feedback', 'conflict', 'social'].map(d => ({ d, s: 'said' })) },
+    'sam-self': { id: 'sam-self', n: 'Sam', notes: ['support', 'plans', 'feedback', 'conflict'].map(d => ({ d, s: 'shared' })) }
+  };
+  const findP = id => SELF[id] || PEOPLE.find(p => p.id === id);
+
+  function loop(ms) {
+    const t = REDUCED ? 1.5 : ms / 1000;
+    document.querySelectorAll('canvas.pcv').forEach(cv => { const p = findP(cv.dataset.pid); if (p) paint(cv, specFor(p), t); });
+    requestAnimationFrame(loop);
+  }
+
+  /* "Watch it grow": sketch → pixels resolving → vivid, then back to the real stage. */
+  function evolve() {
+    const cv = document.getElementById('bigpc'); if (!cv || cv._busy) return;
+    cv._busy = true;
+    const steps = [[1, null, 700], [2, 5, 160], [2, 8, 160], [2, 12, 160], [2, 18, 160], [2, 30, 600], [3, 48, 120], [3, 72, 120], [3, null, 1600]];
+    let i = 0;
+    (function next() {
+      if (i >= steps.length) { delete cv.dataset.stage; cv._res = null; cv._busy = false; return; }
+      const [st, res, ms] = steps[i++];
+      cv.dataset.stage = st; cv._res = st === 3 && res ? res : st === 2 && res !== 30 ? res : null;
+      setTimeout(next, ms);
+    })();
+  }
+
+
+  /* ------------------------------------------------------------------
+   * Onboarding — story-style, tap to advance.
+   * ---------------------------------------------------------------- */
+  const OB = [
+    { kicker: 'EVERY1', h: 'See your people <span class="grad-text">clearer.</span>', p: 'Why did they react like that? What do they actually want? Stop guessing.' },
+    { kicker: 'Living portraits', h: 'Everyone gets a character that <span class="grad-text">grows.</span>', p: 'Starts as a sketch. Sharpens as you actually check things with them. It\'s a character, not their face.' },
+    { kicker: 'Sealed guesses', h: 'Guess each other. <span class="grad-text">Open together.</span>', p: 'Swipe to guess how they\'d answer. It stays sealed until you\'ve both played. No scores — just what each of you said.' },
+    { kicker: 'Your notebook', h: 'Keep notes. <span class="grad-text">Not receipts.</span>', p: 'A private space for what you notice about the people in your life. Only you see it. Ever.' }
+  ];
+  function onboarding() {
+    const s = OB[S.ob];
+    const art = S.ob === 0
+      ? '<div style="position:relative;width:240px;height:240px"><div class="orb" style="inset:0"></div><div class="orb-init" style="inset:0;font-size:4rem">👀</div></div>'
+      : S.ob === 1
+        ? '<div class="col" style="align-items:center;gap:16px"><canvas class="pcv" data-pid="sam" data-size="190" data-cycle="1" style="width:190px;height:190px" aria-hidden="true"></canvas>' +
+          '<div class="row" style="gap:18px">' + [1, 2, 3].map(s => '<div style="display:grid;justify-items:center;gap:4px"><div style="width:62px;height:62px;border-radius:18px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center"><canvas class="pcv" data-pid="sam" data-size="54" data-stage="' + s + '" aria-hidden="true"></canvas></div><span class="faint">' + STAGES[s].e + ' ' + STAGES[s].k + '</span></div>').join('') + '</div></div>'
+      : S.ob === 2
+        ? '<div style="position:relative;width:250px;height:300px"><div class="gcard" style="transform:rotate(-8deg) translateX(-30px);opacity:.5"></div><div class="gcard" style="transform:rotate(6deg)"><p class="eyebrow">How would Sam answer?</p><h2 style="font-size:1.6rem">Worst day ever. Sam wants…</h2><div class="col-sm"><div class="opt"><span class="e">🫂</span>Company</div><div class="opt"><span class="e">🎧</span>Alone time</div></div></div></div>'
+        : '<div class="col" style="width:270px"><div class="card pop-in"><div class="row"><span style="font-size:1.4rem">👀</span><span>Asked for "the headline" twice</span></div></div><div class="card pop-in" style="animation-delay:.12s;margin-left:24px"><div class="row"><span style="font-size:1.4rem">🎯</span><span>Tried leading with it. Worked.</span></div></div><div class="pill lock pop-in" style="animation-delay:.24s;justify-self:start;width:max-content">🔒 Only you can see this</div></div>';
+    return '<div class="ob"><div class="bars">' + OB.map((_, i) => '<i class="' + (i < S.ob ? 'done' : i === S.ob ? 'now' : '') + '"><b></b></i>').join('') + '</div>' +
+      '<div class="between" style="margin-top:12px"><span class="eyebrow">' + s.kicker + '</span><button class="faint" data-act="ob-skip" style="font-weight:700">Skip</button></div>' +
+      '<div class="glow" style="top:120px;left:20px"></div>' +
+      '<div class="stage-art">' + art + '</div>' +
+      '<div class="tapzone"><button data-act="ob-prev" aria-label="Previous"></button><button data-act="ob-next" aria-label="Next"></button></div>' +
+      '<div class="col" style="position:relative;z-index:3"><h1 class="huge" style="font-size:2.7rem">' + s.h + '</h1><p class="muted" style="font-size:1.05rem">' + s.p + '</p>' +
+      '<button class="btn" data-act="' + (S.ob === OB.length - 1 ? 'ob-done' : 'ob-next') + '">' + (S.ob === OB.length - 1 ? 'Let\'s go' : 'Next') + '</button></div></div>';
+  }
+
+  /* ------------------------------------------------------------------
+   * Home — stories row + bento.
+   * ---------------------------------------------------------------- */
+  function home() {
+    const stories = PEOPLE.map(p => '<button class="story" data-act="open" data-pid="' + p.id + '">' +
+      ava(p, 58, p.fresh ? '' : 'dim', p.locked ? '🔒' : p.joined ? '✨' : '') + esc(p.n) + '</button>').join('') +
+      '<button class="story" data-act="add"><div class="add">+</div>Add</button>';
+
+    let drop;
+    if (!S.drop) {
+      drop = '<div class="between"><p class="eyebrow">💧 Today\'s drop</p><span class="pill hot">🪞 your side</span></div><h2 style="font-size:1.5rem">' + DROP.q + '</h2>' +
+        '<div class="bento" style="margin-top:4px">' + ['a', 'b'].map(k => '<button class="card tap" data-act="drop" data-v="' + k + '" style="text-align:center;padding:14px"><div style="font-size:2rem">' + DROP[k][0] + '</div><b>' + DROP[k][1] + '</b></button>').join('') + '</div>';
+    } else {
+      drop = '<p class="eyebrow">💧 Today\'s drop</p><h2 style="font-size:1.4rem">You picked ' + DROP[S.drop][0] + ' ' + DROP[S.drop][1] + '</h2>' +
+        '<p class="muted">Saved to Your Side. Want to know if Sam would guess it? Seal a guess — it opens only when you\'ve both answered.</p>' +
+        '<button class="btn-ghost" data-act="invite" style="margin-top:6px">🔒 Seal a guess</button>' +
+        '<p class="faint">A different card tomorrow. No streaks.</p>';
+    }
+
+    return '<div class="glow" style="top:-120px;right:-140px"></div>' +
+      '<div class="between" style="margin-bottom:16px"><div><p class="faint">Wed, Oct 7</p><h1 class="big">Hey Alex 👋</h1></div>' +
+      '<button data-nav="me">' + ava(SELF.alex, 44, '') + '</button></div>' +
+      '<div class="stories" style="margin-bottom:18px">' + stories + '</div>' +
+      '<div class="bento">' +
+        '<div class="card aura-card wide col pop-in">' + drop + '</div>' +
+        '<button class="card tap wide col pop-in" style="animation-delay:.05s" data-nav="guess">' +
+          '<div class="between"><span class="pill hot">🔥 New from Sam</span><span class="faint">5 cards · 60 sec</span></div>' +
+          '<h2 style="font-size:1.6rem">Sam answered 5 questions about himself. <span class="grad-text">Can you guess them?</span></h2>' +
+          '<div class="row"><div style="flex:1;height:8px;border-radius:8px;background:var(--line);overflow:hidden"><div style="width:100%;height:100%;background:linear-gradient(90deg,var(--peach),var(--pink))"></div></div><span class="faint">his side done</span></div></button>' +
+        '<button class="card tap col pop-in" style="animation-delay:.1s" data-act="prep">' +
+          '<span style="font-size:1.8rem">🎯</span><b>Prep: project review</b><span class="faint">with Maya · tomorrow</span></button>' +
+        '<button class="card tap col pop-in" style="animation-delay:.15s" data-act="invite">' +
+          '<span style="font-size:1.8rem">🔒</span><b>Seal a guess</b><span class="faint">you guess them, they guess you</span></button>' +
+        '<button class="card tap wide pop-in" style="animation-delay:.2s" data-act="open" data-pid="maya" data-tab="ask">' +
+          '<div class="row"><span style="font-size:1.6rem">💬</span><div class="grow"><b>Ask, don\'t guess</b><p class="faint">You can\'t tell how Maya likes hearing about changes. Here\'s a text you could send.</p></div><span class="faint">→</span></div></button>' +
+      '</div>';
+  }
+
+  /* ------------------------------------------------------------------
+   * People.
+   * ---------------------------------------------------------------- */
+  function people() {
+    return '<div class="glow" style="top:-100px;left:-160px"></div>' +
+      '<h1 class="big" style="margin-bottom:6px">Your people</h1><p class="muted" style="margin-bottom:16px">Notebooks are private. Nobody has to join for you to keep one.</p>' +
+      '<div class="bento">' + PEOPLE.map((p, i) =>
+        '<button class="card tap col pop-in" style="animation-delay:' + i * 0.05 + 's" data-act="open" data-pid="' + p.id + '">' +
+          ava(p, 54, p.fresh ? '' : 'dim') + '<b style="font-size:1.05rem">' + esc(p.n) + '</b><span class="faint">' + esc(p.ctx) + '</span>' +
+          '<span class="pills">' + (p.joined ? '<span class="pill mint">✨ together</span>' : '<span class="pill lock">🔒 private</span>') + '</span>' +
+          '<span class="faint">' + p.notes.length + ' notes</span></button>').join('') +
+        '<button class="card tap col" data-act="add" style="border-style:dashed;justify-content:center;align-items:center;text-align:center"><span style="font-size:2rem">+</span><b>Add someone</b><span class="faint">nickname is enough</span></button>' +
+      '</div>';
+  }
+
+  /* ------------------------------------------------------------------
+   * Person — the aura orb with a ring of what you've noticed.
+   * ---------------------------------------------------------------- */
+  function orbRing(p) {
+    const C = 150, R = 136, n = DOMAINS.length, gap = 0.1;
+    const span = (Math.PI * 2) / n;
+    const hues = ['var(--peach)', 'var(--pink)', 'var(--lilac)', 'var(--mint)', 'var(--sun)', 'var(--peach)', 'var(--lilac)'];
+    let out = '';
+    DOMAINS.forEach((d, i) => {
+      const a0 = -Math.PI / 2 + i * span + gap, a1 = a0 + span - gap * 2;
+      const count = p.notes.filter(x => x.d === d.k).length;
+      const pt = (a, r) => (C + Math.cos(a) * r).toFixed(1) + ' ' + (C + Math.sin(a) * r).toFixed(1);
+      const path = 'M' + pt(a0, R) + ' A' + R + ' ' + R + ' 0 0 1 ' + pt(a1, R);
+      out += count
+        ? '<path class="seg" data-act="dom" data-d="' + d.k + '" d="' + path + '" style="stroke:' + hues[i] + ';opacity:' + Math.min(1, 0.45 + count * 0.18) + '"><title>' + d.full + '</title></path>'
+        : '<path class="seg off" data-act="dom" data-d="' + d.k + '" d="' + path + '"><title>' + d.full + ': nothing noticed yet</title></path>';
+      // A generous invisible wedge so the whole slice is tappable, not just the thin arc.
+      const Ri = 92, Ro = 150;
+      out += '<path class="hit" data-act="dom" data-d="' + d.k + '" d="M' + pt(a0, Ro) + ' A' + Ro + ' ' + Ro + ' 0 0 1 ' + pt(a1, Ro) +
+        ' L' + pt(a1, Ri) + ' A' + Ri + ' ' + Ri + ' 0 0 0 ' + pt(a0, Ri) + ' Z"><title>' + d.full + '</title></path>';
+      const am = (a0 + a1) / 2, lr = R - 30;
+      out += '<text x="' + (C + Math.cos(am) * lr).toFixed(1) + '" y="' + (C + Math.sin(am) * lr + 3).toFixed(1) + '" text-anchor="middle" class="' + (count ? '' : 'off-t') + '">' + d.l + (count ? ' · ' + count : '') + '</text>';
+    });
+    return '<svg class="orb-ring" viewBox="0 0 300 300" role="img" aria-label="What you have noticed about ' + esc(p.n) + ', by area">' + out + '</svg>';
+  }
+
+  function person() {
+    const p = P(S.pid);
+    const tabs = [['aura', 'Aura'], ['notes', 'Notes'], ['vibes', 'Patterns'], ['ask', 'Ask']];
+    if (p.joined) tabs.push(['together', 'Together']);
+    let body = '';
+
+    if (S.tab === 'aura') {
+      const lit = DOMAINS.filter(d => p.notes.some(x => x.d === d.k)).length;
+      body = (p.lopsided ? '<div class="sticker warn">⚠️ Heads up: 4 of your 5 notes on Dev are from moments that went badly. Bad moments stick harder. Got a good one to add?</div>' : '') +
+        '<div class="orb-wrap pop-in"><div class="orb" style="inset:24%;opacity:.45;filter:blur(18px)"></div><canvas class="pcv" id="bigpc" data-pid="' + p.id + '" data-size="168" style="position:absolute;inset:22%;width:56%;height:56%" role="img" aria-label="' + esc(p.n) + '\'s character, stage ' + specFor(p).stage + ' of 3"></canvas>' + orbRing(p) + '</div>' +
+        (() => { const sp = specFor(p), st = STAGES[sp.stage];
+          return '<div class="card col-sm" style="text-align:center;align-items:center"><div class="row" style="justify-content:center"><span class="pill ' + (sp.stage === 3 ? 'mint' : sp.stage === 2 ? 'lock' : '') + '">' + st.e + ' Stage ' + sp.stage + ' of 3 · ' + st.k + '</span></div>' +
+            '<p class="faint">' + (sp.stage === 3 ? 'Fully grown. You\'ve checked plenty with ' + esc(p.n) + ' directly.' : 'Sharpens when you check things with ' + esc(p.n) + ': ask, try something, hear it from them. Adding more notes won\'t do it.') + '</p>' +
+            '<div class="row" style="justify-content:center;flex-wrap:wrap"><button class="pill" data-act="evolve">▶ Watch it grow</button><button class="pill" data-act="legend">What shapes it?</button></div></div>'; })() +
+        '<p class="faint" style="text-align:center">You\'ve noticed things in ' + lit + ' of 7 areas. Dotted means nothing yet, and that\'s fine. Tap a glowing area to open it.</p>' +
+        (p.pats.length ? '<p class="eyebrow">Patterns you\'re noticing</p><div class="hscroll">' + p.pats.map(patCard).join('') + '</div>' : '');
+    }
+    if (S.tab === 'notes') {
+      body = '<div class="card col">' + [...p.notes].reverse().map(noteRow).join('') + '</div>' +
+        '<button class="btn" data-act="note" data-pid="' + p.id + '">+ Add a note about ' + esc(p.n) + '</button>';
+    }
+    if (S.tab === 'vibes') {
+      body = p.pats.map(x => '<div style="width:100%">' + patCard(x) + '</div>').join('') +
+        '<p class="faint">🌱 hunch → 🌿 getting there → 🌳 solid. Watching alone never gets you to solid. Only checking with them does.</p>';
+    }
+    if (S.tab === 'ask') {
+      body = (p.stop ? '<div class="sticker cool">👀 You\'ve noticed about as much as you can from the outside. The rest only ' + esc(p.n) + ' can tell you.</div>' : '') +
+        (p.asks.length ? p.asks.map((a, i) => '<div class="card col"><b style="font-size:1.05rem">' + esc(a.q) + '</b>' +
+          '<div style="background:rgba(183,156,255,0.14);border:1px solid rgba(183,156,255,0.35);border-radius:20px 20px 6px 20px;padding:12px 14px;align-self:flex-end;max-width:88%">' + esc(a.msg) + '</div>' +
+          '<div class="bento"><button class="btn-ghost" data-act="copy" data-i="' + i + '">Copy text</button><button class="btn-ghost" data-act="asked">I asked ✓</button></div>' +
+          '<p class="faint">If they\'d rather not say, that\'s the answer. It doesn\'t count as anything.</p></div>').join('')
+          : '<div class="card"><p class="muted">No open questions yet. Keep noticing, and they\'ll show up here.</p></div>');
+    }
+    if (S.tab === 'together') {
+      body = '<div class="card col"><p class="eyebrow">On bad days</p><div class="bento">' +
+        '<div class="col-sm"><span class="faint">You noticed</span><p>👀 ' + esc(p.notes[0].t) + '</p></div>' +
+        '<div class="col-sm"><span class="faint">Sam says</span><p>✨ ' + esc(p.notes[1].t) + '</p></div></div>' +
+        '<p class="faint">Both stay as they are. Nobody "wins". The gap is the interesting part: maybe the walk was his alone time.</p></div>' +
+        '<button class="card tap col" data-nav="guess"><span class="pill hot">🔥 Round 4 ready</span><b style="font-size:1.1rem">Guess Sam\'s 5 answers</b><span class="faint">Nothing\'s revealed until you\'ve both played.</span></button>';
+    }
+
+    return '<div class="glow" style="top:-80px;left:0"></div>' +
+      '<div class="between" style="margin-bottom:10px"><button data-nav="people" class="faint" style="font-weight:700">← People</button>' +
+      (p.locked ? '<span class="pill lock">🔒 Only you see this</span>' : '<span class="pill mint">✨ ' + esc(p.n) + ' joined</span>') + '</div>' +
+      '<div class="row" style="margin-bottom:14px">' + ava(p, 52, p.fresh ? '' : 'dim') + '<div><h1 style="font-size:2.1rem">' + esc(p.n) + '</h1><span class="faint">' + esc(p.ctx) + '</span></div></div>' +
+      '<div class="tabs" style="margin-bottom:14px">' + tabs.map(([k, l]) => '<button data-tabk="' + k + '" aria-current="' + (S.tab === k) + '">' + l + '</button>').join('') + '</div>' +
+      '<div class="col">' + body + '</div>';
+  }
+
+  function patCard(x) {
+    const b = BAND[x.b];
+    return '<div class="card col-sm" style="background:linear-gradient(160deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))">' +
+      '<span class="pill' + (x.b === 'mixed' ? ' hot' : x.b === 'solid' ? ' mint' : '') + '" style="width:max-content">' + b.e + ' ' + b.l + '</span>' +
+      '<b style="font-family:var(--display);font-size:1.25rem;line-height:1.15">' + esc(x.t) + '</b><span class="faint">' + esc(x.why) + '</span></div>';
+  }
+  function noteRow(x) {
+    return '<div class="note"><div class="em">' + SRC[x.s].e + '</div><div class="col-sm"><div class="row"><span class="faint">' + SRC[x.s].l + ' · ' + esc(x.w) + '</span>' +
+      (x.off ? '<span class="pill hot" style="padding:2px 8px;font-size:0.7rem">doesn\'t fit</span>' : '') + '</div>' +
+      '<p>' + esc(x.t) + '</p>' + (x.read ? '<p class="read">💭 my read: ' + esc(x.read) + '</p>' : '') + '</div></div>';
+  }
+
+  /* ------------------------------------------------------------------
+   * Guess game — swipe cards.
+   * ---------------------------------------------------------------- */
+  function guess() {
+    const g = S.game;
+    if (g.i >= GAME.length) return reveal();
+    const card = c => '<div class="eyebrow" style="color:var(--pink)">How would Sam answer?</div><h2 style="font-size:2rem">' + esc(c.q) + '</h2>' +
+      '<div class="col-sm"><div class="opt"><span class="e">' + c.a[0] + '</span>' + esc(c.a[1]) + '</div><div class="opt"><span class="e">' + c.b[0] + '</span>' + esc(c.b[1]) + '</div></div>' +
+      '<div class="between faint"><span>← swipe for top</span><span>bottom →</span></div>';
+    const next = GAME[g.i + 1];
+    return '<div class="glow" style="top:40px;left:-100px"></div>' +
+      '<div class="between" style="margin-bottom:12px"><button data-nav="home" class="faint" style="font-weight:700">✕</button><span class="faint" style="font-weight:700">' + (g.i + 1) + ' / ' + GAME.length + '</span></div>' +
+      '<div class="progress" style="margin-bottom:16px">' + GAME.map((_, i) => '<i class="' + (i < g.i ? 'on' : '') + '"></i>').join('') + '</div>' +
+      '<div class="deck">' + (next ? '<div class="gcard behind">' + card(next) + '</div>' : '') +
+      '<div class="gcard" id="gcard"><span class="hint-l">' + GAME[g.i].a[0] + '</span><span class="hint-r">' + GAME[g.i].b[0] + '</span>' + card(GAME[g.i]) + '</div></div>' +
+      '<div class="bento" style="margin-top:16px"><button class="btn-ghost" data-act="pick" data-v="a">' + GAME[g.i].a[0] + ' ' + esc(GAME[g.i].a[1]) + '</button><button class="btn-ghost" data-act="pick" data-v="b">' + GAME[g.i].b[0] + ' ' + esc(GAME[g.i].b[1]) + '</button></div>' +
+      '<p class="faint" style="text-align:center;margin-top:12px">Sam already answered. You\'ll both see the reveal together.</p>';
+  }
+
+  function reveal() {
+    const g = S.game;
+    const miss = GAME.find((c, i) => g.picks[i] !== c.sam);
+    return '<div class="glow" style="top:0;left:-60px;opacity:.5"></div>' +
+      '<p class="eyebrow" style="text-align:center">Round 4 · unsealed 🔓</p>' +
+      '<h1 class="big pop-in" style="text-align:center;margin:8px 0 6px">You both played. <span class="grad-text">Here\'s what each of you said.</span></h1>' +
+      '<p class="faint" style="text-align:center;margin-bottom:16px">No score. The surprises are the good part.</p>' +
+      '<div class="col">' + GAME.map((c, i) => {
+        const ok = g.picks[i] === c.sam;
+        return '<div class="card row pop-in" style="animation-delay:' + (i * 0.08) + 's"><span style="font-size:1.6rem">' + c[c.sam][0] + '</span><div class="grow"><b>' + esc(c.q) + '</b><p class="faint">Sam: ' + esc(c[c.sam][1]) + (ok ? '' : ' · you guessed ' + esc(c[g.picks[i]][1])) + '</p></div><span class="pill ' + (ok ? 'mint' : 'hot') + '">' + (ok ? 'in sync' : 'surprise') + '</span></div>';
+      }).join('') + '</div>' +
+      (miss ? '<div class="sticker cool" style="margin-top:14px">💡 Worth a chat: "' + esc(miss.q.replace('…', '')) + '". You thought ' + esc(miss[g.picks[GAME.indexOf(miss)]][1].toLowerCase()) + ', he said ' + esc(miss[miss.sam][1].toLowerCase()) + '. Ask him about it, don\'t just log it.</div>' : '') +
+      '<div class="col" style="margin-top:16px"><button class="btn" data-act="share">Make our card ✨</button><button class="btn-ghost" data-act="replay">Play again</button></div>';
+  }
+
+  function shareSheet() {
+    const g = S.game;
+    const miss = GAME.find((c, i) => g.picks[i] !== c.sam);
+    const sync = [...new Set(GAME.filter((c, i) => g.picks[i] === c.sam).map(c => c.dom.toLowerCase()))].slice(0, 2);
+    return '<div class="grab"></div>' +
+      '<div class="share pop-in"><div class="blob2"></div>' +
+      '<div class="between" style="position:relative"><b style="font-family:var(--display);font-size:1.1rem">EVERY1</b><span style="font-weight:700">Round 4</span></div>' +
+      '<div class="row" style="position:relative;gap:6px">' + ['alex', 'sam-self'].map(id => '<div style="width:74px;height:74px;border-radius:50%;background:#170f1e;display:grid;place-items:center;overflow:hidden"><canvas class="pcv" data-pid="' + id + '" data-size="70" aria-hidden="true"></canvas></div>').join('<b style="font-family:var(--display);font-size:1.6rem">×</b>') + '</div>' +
+      '<div style="position:relative"><p style="font-weight:700;font-size:1.1rem">Alex × Sam</p><h2 style="font-size:2.1rem">' + (sync.length ? 'We read each other right on ' + esc(sync.join(' & ')) : 'We surprised each other') + '.</h2></div>' +
+      '<div style="position:relative"><p style="font-weight:700;opacity:.75;font-size:.85rem">BIGGEST SURPRISE</p><p style="font-family:var(--display);font-weight:700;font-size:1.3rem;line-height:1.15">' +
+        (miss ? esc(miss.q.replace('…', '')) + ' → ' + miss[miss.sam][0] + ' ' + esc(miss[miss.sam][1]) : 'None. Scary accurate.') + '</p></div>' +
+      '<p style="position:relative;font-weight:700">Both of us chose to play. No scores. 🔒</p></div>' +
+      '<div class="col" style="margin-top:16px"><button class="btn" data-act="post">Share to story</button><button class="btn-ghost" data-act="copylink">Copy link</button>' +
+      '<p class="faint" style="text-align:center">Shows only your round with Sam, which you both played, and characters made from each of your own answers. Never anything from your private notebooks.</p></div>';
+  }
+
+  /* ------------------------------------------------------------------
+   * Me.
+   * ---------------------------------------------------------------- */
+  function me() {
+    return '<div class="glow" style="top:-60px;left:20px;opacity:.5"></div>' +
+      '<div style="position:relative;width:200px;height:200px;margin:4px auto 10px"><div class="orb" style="inset:12%;opacity:.4;filter:blur(20px)"></div><canvas class="pcv" data-pid="alex" data-size="200" style="position:absolute;inset:0;width:100%;height:100%" role="img" aria-label="Your character"></canvas></div>' +
+      '<h1 class="big" style="text-align:center">Alex</h1><p class="faint" style="text-align:center;margin-bottom:16px">Your character, made only from your own answers · 🌈 Vivid</p>' +
+      '<div class="bento">' +
+        [['Bad days', '🎧', 'Room first'], ['Plans', '🌊', 'Go with it'], ['Feedback', '🎯', 'Straight up'], ['After a fight', '📱', 'Text first']].map(([k, e, v], i) =>
+          '<div class="card col-sm pop-in" style="animation-delay:' + i * .05 + 's"><span class="eyebrow">' + k + '</span><span style="font-size:2rem">' + e + '</span><b style="font-family:var(--display);font-size:1.2rem">' + v + '</b></div>').join('') +
+        '<div class="card aura-card wide col-sm"><span class="eyebrow">You around people</span><b style="font-family:var(--display);font-size:1.25rem">Things go better with Maya when you lead with the headline.</b><span class="faint">From something you tried · Oct 2</span></div>' +
+        '<button class="card tap wide row" data-act="wrapped"><span style="font-size:1.8rem">🎁</span><div class="grow"><b>Your October, wrapped</b><p class="faint">What you checked, what changed your mind. About you only.</p></div><span class="faint">→</span></button>' +
+        '<button class="card tap wide row" data-act="privacy"><span style="font-size:1.5rem">🔒</span><div class="grow"><b>Privacy</b><p class="faint">App lock on · notebooks private · never used to train AI</p></div><span class="faint">→</span></button>' +
+      '</div>';
+  }
+
+  /* ------------------------------------------------------------------
+   * Sheets: note composer, prep, domain, invite, privacy, add person.
+   * ---------------------------------------------------------------- */
+  const CHECKS = [
+    { k: 'monitor', re: /\b(track|follow(ed)? (her|him|them)|check(ed)? (her|his|their) phone|where (she|he|they) (goes|went|was)|who (she|he|they)('?s| is| are| was)? (texting|seeing|messaging))\b/i, cls: 'stop', block: true,
+      msg: '🛑 EVERY1 doesn\'t track where people go or who they talk to. If something\'s worrying you, let\'s talk about that instead.' },
+    { k: 'health', re: /(\b(i think|probably|maybe|must be|seems?( to be)?|definitely|clearly)\b.{0,30}\b(depress\w*|adhd|autis\w*|bipolar|on the spectrum|ocd|narcissis\w*|psychopath\w*|sociopath\w*)\b)|(\b(she|he|they)('s| is| are)( a| an)? (depressed|adhd|autistic|bipolar|on the spectrum|ocd|narcissist\w*|psychopath\w*|sociopath\w*)\b)/i, cls: 'stop', block: true,
+      msg: '🛑 We don\'t save guesses about someone\'s health or mental state. What did you actually see them do or say?' },
+    { k: 'hearsay', re: /(\b(?!(?:He|She|They|We|I)\b)[A-Z][a-z]+ (said|says|told me) (that )?(he|she|they)\b)|(\b(my \w+|someone|people|everyone) (said|says|told me)\b)|(\b[Ii] heard (that )?(he|she|they)\b)|(\b[Aa]pparently,? (he|she|they)\b)/, cls: 'warn', q: true,
+      msg: '🗣️ That\'s second-hand. It won\'t count as something you noticed, but it could be a question you ask.' },
+    { k: 'trait', re: /\b(rude|lazy|selfish|needy|manipulative|controlling|toxic|passive[- ]aggressive|clingy|arrogant|cringe)\b/i, cls: 'cool', read: true,
+      msg: '👀 That\'s a verdict, not a moment. What did they actually do or say? Your take can go in "my read".' }
+  ];
+
+  function noteSheet() {
+    const n = S.note;
+    const hits = CHECKS.filter(c => c.re.test(n.t));
+    const blocked = hits.some(h => h.block);
+    const chips = (f, opts) => '<div class="pills">' + opts.map(o => '<button class="chip" data-act="nf" data-f="' + f + '" data-v="' + esc(o) + '" aria-pressed="' + (n[f] === o) + '">' + esc(o) + '</button>').join('') + '</div>';
+    return '<div class="grab"></div><div class="col">' +
+      '<div class="between"><h2 style="font-size:1.7rem">Spill it 👀</h2><button class="faint" data-act="close" style="font-weight:700">Cancel</button></div>' +
+      '<div class="stories" style="margin:0 -18px">' + PEOPLE.map(p => '<button class="story" data-act="np" data-v="' + p.id + '" style="opacity:' + (n.pid === p.id ? 1 : .45) + '">' + ava(p, 46, n.pid === p.id ? '' : 'dim') + esc(p.n) + '</button>').join('') + '</div>' +
+      '<span class="eyebrow">Tap what happened</span>' +
+      '<div class="bento" style="grid-template-columns:repeat(3,1fr);gap:8px">' + MOMENTS.map(([e, l], i) => '<button class="card tap col-sm" data-act="mom" data-i="' + i + '" style="align-items:center;text-align:center;padding:10px 4px;' + (n.m === i ? 'background:var(--text);color:#170f1e' : '') + '"><span style="font-size:1.4rem">' + e + '</span><b style="font-size:.78rem">' + l + '</b></button>').join('') + '</div>' +
+      '<span class="eyebrow">…or say more (optional)</span>' +
+      '<textarea class="field" id="nt" style="min-height:80px" placeholder="What exactly did they say or do? The moment, not the verdict.">' + esc(n.t) + '</textarea>' +
+      '<div class="pills"><span class="faint">see what happens if you write:</span>' + ['she was so rude today', 'Jo said he never listens', 'I think she\'s depressed', 'where he went last night'].map(e => '<button class="pill" data-act="ex" data-v="' + esc(e) + '">' + esc(e) + '</button>').join('') + '</div>' +
+      '<div id="checks" class="col-sm">' + checksHtml(hits) + '</div>' +
+      '<input class="field" id="nr" placeholder="💭 My read (optional, kept separate)" value="' + esc(n.r) + '" style="font-style:italic">' +
+      '<span class="eyebrow">Where</span>' + chips('where', ['💼 Work', '🏠 Home', '🎉 Hangout', '📱 Online', '👨‍👩‍👧 Family']) +
+      '<button class="btn" id="nsave" data-act="nsave"' + (blocked || !n.t.trim() ? ' disabled' : '') + '>' + (n.m != null ? 'Save ✨' : 'Save note') + '</button>' +
+      '<p class="faint" style="text-align:center">🔒 Only you see this. Never shared, never used to train AI.</p></div>';
+  }
+  function checksHtml(hits) {
+    return hits.map(h => '<div class="sticker ' + h.cls + ' pop-in">' + h.msg +
+      (h.q ? '<div style="margin-top:8px"><button class="pill" data-act="toq">Turn it into a question</button></div>' : '') +
+      (h.read ? '<div style="margin-top:8px"><button class="pill" data-act="toread">Move "' + esc((S.note.t.match(h.re) || [''])[0]) + '" to my read</button></div>' : '') + '</div>').join('');
+  }
+
+  function prepSheet() {
+    const item = (e, t, s) => '<div class="note"><div class="em">' + e + '</div><div class="col-sm"><b>' + t + '</b><span class="faint">' + s + '</span></div></div>';
+    return '<div class="grab"></div><div class="col">' +
+      '<p class="eyebrow">🎯 Prep · tomorrow</p><h2 style="font-size:1.8rem">Project review with Maya</h2>' +
+      '<div class="card col"><span class="eyebrow" style="color:var(--mint)">What works</span>' +
+        item('💬', 'Complicated thing? Call, don\'t write an essay.', 'She told you this herself') +
+        item('🌿', 'Headline first, details after.', 'Seen 3 times · worked when you tried it') + '</div>' +
+      '<div class="card col"><span class="eyebrow" style="color:var(--sun)">Still a mystery</span>' + item('○', 'How she likes hearing about changes', 'The deadline might come up') + '</div>' +
+      '<div class="card col" style="background:rgba(183,156,255,0.12)"><span class="eyebrow" style="color:var(--lilac)">One thing to ask</span><p style="font-family:var(--display);font-size:1.2rem;font-weight:700">"If plans change, want to know straight away, or once it\'s settled?"</p></div>' +
+      '<div class="card col"><span class="eyebrow" style="color:var(--pink)">Don\'t assume</span>' +
+        item('🌱', 'Quiet = annoyed with you', 'Once, and only your read') + item('🌗', 'She\'ll save disagreements for later', 'One time she didn\'t') + '</div>' +
+      '<div class="card"><span class="eyebrow">Your side</span><p class="muted" style="margin-top:4px">You tend to over-explain when you\'re nervous. Keep it short.</p></div>' +
+      '<button class="btn" data-act="remind">Remind me to reflect after</button></div>';
+  }
+
+  function domSheet(dk) {
+    const p = P(S.pid), d = DOMAINS.find(x => x.k === dk);
+    const notes = p.notes.filter(x => x.d === dk), pats = p.pats.filter(x => x.d === dk);
+    return '<div class="grab"></div><div class="col"><p class="eyebrow">' + esc(p.n) + '</p><h2 style="font-size:1.8rem">' + d.full + '</h2>' +
+      (notes.length ? pats.map(patCard).join('') + '<div class="card col">' + notes.map(noteRow).join('') + '</div>'
+        : '<div class="card col"><span style="font-size:2rem">🌫️</span><b>Nothing noticed here yet</b><p class="muted">That\'s fine. Empty stays empty until you actually see something.</p></div>') +
+      '<button class="btn" data-act="note" data-pid="' + p.id + '">+ Add a note</button></div>';
+  }
+
+  function inviteSheet() {
+    const qs = [['On a bad day I want…', '🫂 company', '🎧 alone time'], ['Plans?', '🗓️ booked', '🌊 vibes'], ['Feedback?', '🍬 gentle', '🎯 straight']];
+    return '<div class="grab"></div><div class="col"><p class="eyebrow">🔒 Seal a guess</p><h2 style="font-size:1.9rem">Answer for you. <span class="grad-text">They guess.</span></h2>' +
+      '<p class="muted">Your friend answers for themselves and guesses you. Everything stays sealed until you\'ve both finished — then it opens for both of you at once.</p>' +
+      qs.map(([q, a, b], i) => '<div class="card col-sm"><b>' + q + '</b><div class="bento">' +
+        ['a', 'b'].map((k, j) => '<button class="chip" data-act="myc" data-i="' + i + '" data-v="' + k + '" aria-pressed="' + (S.myCard[i] === k) + '" style="text-align:center">' + (j ? b : a) + '</button>').join('') + '</div></div>').join('') +
+      '<button class="btn" data-act="copylink">Copy my link</button>' +
+      '<p class="faint" style="text-align:center">Your link only shares your own answers. Friends never see anything you\'ve written about them.</p></div>';
+  }
+
+  function legendSheet() {
+    const p = P(S.pid);
+    const f = [['〰️', 'Sound waves', 'you\'ve noticed how they talk'], ['◐', 'Two-tone split', 'how disagreements go'], ['☁️', 'Little cloud', 'what helps on bad days'],
+      ['🪐', 'Orbit and moons', 'plans and decisions'], ['📡', 'Antenna', 'feedback and credit'], ['👁️', 'Third eye and bubbles', 'social energy'], ['⭕', 'Outer ring', 'boundaries and space']];
+    return '<div class="grab"></div><div class="col"><p class="eyebrow">Living portrait</p><h2 style="font-size:1.8rem">What shapes ' + esc(p.n) + '\'s character</h2>' +
+      '<div class="card col">' + f.map(([e, k, v]) => '<div class="row"><span style="font-size:1.4rem;width:30px;text-align:center">' + e + '</span><div><b>' + k + '</b><p class="faint">appears once ' + v + '</p></div></div>').join('') + '</div>' +
+      '<div class="card col-sm"><b>How it grows</b><div class="row" style="justify-content:space-between">' + [1, 2, 3].map(s => '<div style="display:grid;justify-items:center;gap:4px"><canvas class="pcv" data-pid="' + p.id + '" data-size="64" data-stage="' + s + '" aria-hidden="true"></canvas><span class="faint">' + STAGES[s].e + ' ' + STAGES[s].k + '</span></div>').join('') + '</div>' +
+      '<p class="faint">It sharpens with things you\'ve checked: what they told you, what they shared, what happened when you tried something. Piling up notes doesn\'t count.</p></div>' +
+      '<div class="sticker cool">It\'s a character, not their face. Shape and colours are random per person, no feature means good or bad, and nothing here guesses what anyone looks like or who they are. It stays in your notebook.</div></div>';
+  }
+
+  /* Monthly Wrapped (v0.3 §33.4) — about you only; no names, nothing about anyone else. */
+  function wrappedSheet() {
+    const stat = (e, n, l) => '<p style="font-weight:700;font-size:1.05rem;position:relative">' + e + ' <span style="font-family:var(--display);font-size:1.7rem">' + n + '</span> ' + l + '</p>';
+    return '<div class="grab"></div>' +
+      '<div class="share pop-in"><div class="blob2"></div>' +
+      '<p style="position:relative;font-weight:800;letter-spacing:.1em;font-size:.75rem;opacity:.7">OCTOBER · WRAPPED</p>' +
+      '<h2 style="position:relative;font-size:2.4rem">You changed your mind once. That\'s the whole point.</h2>' +
+      '<div class="col-sm">' + stat('🎯', 4, 'things you checked instead of guessing') + stat('🪦', 1, 'old read you retired') + stat('🧩', 2, 'patterns you started') +
+      '<p style="position:relative;font-weight:600">Your lens this month: 🌧️ bad days</p></div></div>' +
+      '<div class="col" style="margin-top:16px"><button class="btn" data-act="post">Share my month ↗</button>' +
+      '<p class="faint" style="text-align:center">About you only — no names, nothing about anyone else.</p></div>';
+  }
+
+  function privacySheet() {
+    const row = (e, t, s, on) => '<div class="between card"><div class="row"><span style="font-size:1.4rem">' + e + '</span><div><b>' + t + '</b><p class="faint">' + s + '</p></div></div><span class="pill ' + (on ? 'mint' : '') + '">' + (on ? 'On' : 'Off') + '</span></div>';
+    return '<div class="grab"></div><div class="col"><h2 style="font-size:1.8rem">Privacy, no fine print</h2>' +
+      row('🔒', 'App lock', 'Face ID to open notebooks', true) +
+      row('🥷', 'Discreet mode', 'App shows up as "Notes"', false) +
+      row('🔕', 'Quiet notifications', 'Never show what\'s in a note', true) +
+      '<div class="card col-sm"><b>Your notes about people</b><p class="muted">Only you see them. Never used to train AI or for research. That stays true even if you say yes, because the notes are about someone who hasn\'t agreed.</p></div>' +
+      '<div class="sticker warn">⚖️ Private isn\'t the same as legally protected. A court could ask for your notes. Write what you\'d be OK with being read out loud.</div>' +
+      '<button class="btn-ghost" data-act="soon">Export my data</button><button class="btn-ghost" data-act="soon" style="color:var(--pink)">Delete everything</button></div>';
+  }
+
+  function addSheet() {
+    const a = S.add || (S.add = { n: '', ctx: null, adult: null });
+    const ok = a.n.trim() && a.ctx && a.adult === 'yes';
+    return '<div class="grab"></div><div class="col"><h2 style="font-size:1.8rem">Add someone</h2>' +
+      '<input class="field" id="an" maxlength="24" placeholder="First name or nickname" value="' + esc(a.n) + '">' +
+      '<span class="eyebrow">They are your…</span><div class="pills">' + ['Friend', 'Bestie', 'Family', 'Partner', 'Ex', 'Colleague', 'Boss'].map(c => '<button class="chip" data-act="actx" data-v="' + c + '" aria-pressed="' + (a.ctx === c) + '">' + c + '</button>').join('') + '</div>' +
+      (a.ctx === 'Ex' ? '<p class="faint">Tips to message them are off by default for exes. You can switch them on if contact is welcome.</p>' : '') +
+      '<span class="eyebrow">Are they 18+?</span><div class="pills"><button class="chip" data-act="aad" data-v="yes" aria-pressed="' + (a.adult === 'yes') + '">Yes</button><button class="chip" data-act="aad" data-v="no" aria-pressed="' + (a.adult === 'no') + '">No</button></div>' +
+      (a.adult === 'no' ? '<div class="sticker warn">EVERY1 is built for understanding adults. For kids and teens, there are better places to get support.</div>' : '') +
+      '<button class="btn" data-act="acreate"' + (ok ? '' : ' disabled') + '>Create their aura</button>' +
+      '<p class="faint" style="text-align:center">No photo, surname or number needed. Ever.</p></div>';
+  }
+
+  /* ------------------------------------------------------------------
+   * Render.
+   * ---------------------------------------------------------------- */
+  const VIEWS = { home, people, person, guess, me };
+  function render() {
+    $('view').innerHTML = VIEWS[S.view]();
+    document.querySelectorAll('#nav [data-nav]').forEach(b => {
+      if (b.dataset.nav === S.view || (S.view === 'person' && b.dataset.nav === 'people')) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+    });
+    $('nav').hidden = !S.obDone;
+    renderLayer();
+    syncArrows();
+    if (S.view === 'guess' && S.game.i < GAME.length) bindSwipe();
+  }
+  function renderLayer() {
+    let html = '';
+    if (!S.obDone) html = onboarding();
+    else if (S.sheet) {
+      const body = { wrapped: wrappedSheet, note: noteSheet, prep: prepSheet, invite: inviteSheet, privacy: privacySheet, add: addSheet, share: shareSheet, legend: legendSheet }[S.sheet.k];
+      html = '<div class="sheet-back" data-act="close"></div><div class="sheet" role="dialog" aria-modal="true">' + (S.sheet.k === 'dom' ? domSheet(S.sheet.d) : body()) + '</div>';
+    }
+    $('layer').innerHTML = html;
+    if ($('hback')) syncArrows();
+  }
+  /* Back / forward. Every screen change is an entry; the arrows and the
+     phone's own back gesture both walk it. Sheets close before going back. */
+  const HIST = [{ view: 'home', pid: null, tab: 'aura' }];
+  let HI = 0, useHist = true;
+  try { history.replaceState({ hi: 0 }, ''); } catch (e) { useHist = false; }
+  function apply(snap) { S.view = snap.view; S.pid = snap.pid; S.tab = snap.tab; S.sheet = null; $('scroll').scrollTop = 0; render(); }
+  function go(next) {
+    const cur = HIST[HI], snap = { view: next.view, pid: next.pid !== undefined ? next.pid : S.pid, tab: next.tab || (next.view === S.view ? S.tab : 'aura') };
+    if (cur.view === snap.view && cur.pid === snap.pid && cur.tab === snap.tab) { S.sheet = null; render(); return; }
+    HIST.splice(HI + 1); HIST.push(snap); HI++;
+    if (useHist) { try { history.pushState({ hi: HI }, ''); } catch (e) { useHist = false; } }
+    apply(snap);
+  }
+  function nav(v) { go({ view: v }); }
+  function goBack() {
+    if (S.sheet) { S.sheet = null; renderLayer(); return; }
+    if (HI === 0) return;
+    if (useHist) history.back(); else { HI--; apply(HIST[HI]); }
+  }
+  function goFwd() {
+    if (HI >= HIST.length - 1) return;
+    if (useHist) history.forward(); else { HI++; apply(HIST[HI]); }
+  }
+  window.addEventListener('popstate', e => {
+    const hi = e.state && typeof e.state.hi === 'number' ? e.state.hi : 0;
+    if (hi < 0 || hi >= HIST.length) return;
+    HI = hi; apply(HIST[HI]);
+  });
+  function syncArrows() {
+    $('hback').disabled = HI === 0 && !S.sheet;
+    $('hfwd').disabled = HI >= HIST.length - 1;
+    const titles = { home: 'Home', people: 'People', guess: 'Guess', me: 'Me' };
+    $('httl').textContent = S.view === 'person' ? (P(S.pid) ? P(S.pid).n : '') : titles[S.view] || '';
+    $('topbar').hidden = !S.obDone;
+  }
+  function sheet(k, extra = {}) { S.sheet = { k, ...extra }; renderLayer(); }
+
+  /* Swipe with pointer events; buttons do the same thing. */
+  function bindSwipe() {
+    const el = $('gcard'); if (!el) return;
+    let x0 = null, dx = 0;
+    const hl = el.querySelector('.hint-l'), hr = el.querySelector('.hint-r');
+    el.addEventListener('pointerdown', e => { x0 = e.clientX; el.setPointerCapture(e.pointerId); el.style.transition = 'none'; });
+    el.addEventListener('pointermove', e => {
+      if (x0 === null) return; dx = e.clientX - x0;
+      el.style.transform = 'translateX(' + dx + 'px) rotate(' + dx / 14 + 'deg)';
+      hl.style.opacity = Math.max(0, -dx / 90); hr.style.opacity = Math.max(0, dx / 90);
+    });
+    const end = () => {
+      if (x0 === null) return; el.style.transition = '';
+      if (Math.abs(dx) > 90) pick(dx < 0 ? 'a' : 'b', dx < 0 ? -1 : 1);
+      else { el.style.transform = ''; hl.style.opacity = 0; hr.style.opacity = 0; }
+      x0 = null; dx = 0;
+    };
+    el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+  }
+  function pick(v, dir = v === 'a' ? -1 : 1) {
+    const el = $('gcard');
+    S.game.picks[S.game.i] = v;
+    if (el) { el.style.transform = 'translateX(' + dir * 520 + 'px) rotate(' + dir * 28 + 'deg)'; el.style.opacity = '0'; }
+    setTimeout(() => { S.game.i += 1; render(); if (S.game.i >= GAME.length) confetti(); }, 230);
+  }
+
+  function confetti() {
+    const cv = document.createElement('canvas'); cv.className = 'confetti';
+    const ph = $('phone'); cv.width = ph.clientWidth; cv.height = ph.clientHeight; ph.appendChild(cv);
+    const ctx = cv.getContext('2d'); const cols = ['#ff9e7a', '#ff5c9a', '#b79cff', '#6ff2c9', '#ffd66b'];
+    const bits = Array.from({ length: 120 }, () => ({ x: cv.width / 2, y: cv.height * 0.3, vx: (Math.random() - 0.5) * 12, vy: Math.random() * -12 - 3, r: Math.random() * 6 + 3, c: cols[Math.floor(Math.random() * 5)], a: Math.random() * 6 }));
+    let f = 0;
+    (function tick() {
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      bits.forEach(b => { b.vy += 0.35; b.x += b.vx; b.y += b.vy; b.a += 0.2; ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.a); ctx.fillStyle = b.c; ctx.fillRect(-b.r / 2, -b.r / 2, b.r, b.r * 0.6); ctx.restore(); });
+      if (++f < 120) requestAnimationFrame(tick); else cv.remove();
+    })();
+  }
+
+  function copy(text, ok) {
+    try { navigator.clipboard.writeText(text).then(() => toast(ok), () => toast(ok)); } catch (e) { toast(ok); }
+  }
+
+  /* ------------------------------------------------------------------
+   * Events.
+   * ---------------------------------------------------------------- */
+  document.addEventListener('input', e => {
+    if (e.target.id === 'nt') {
+      S.note.t = e.target.value;
+      const hits = CHECKS.filter(c => c.re.test(S.note.t));
+      $('checks').innerHTML = checksHtml(hits);
+      $('nsave').disabled = hits.some(h => h.block) || !S.note.t.trim();
+    }
+    if (e.target.id === 'nr') S.note.r = e.target.value;
+    if (e.target.id === 'an') { S.add.n = e.target.value; const btn = document.querySelector('[data-act="acreate"]'); if (btn) btn.disabled = !(S.add.n.trim() && S.add.ctx && S.add.adult === 'yes'); }
+  });
+
+  document.addEventListener('click', e => {
+    const el = e.target.closest('[data-nav],[data-act],[data-tabk]');
+    if (!el) return;
+    const d = el.dataset;
+    if (d.nav) { nav(d.nav); return; }
+    if (d.tabk) { go({ view: 'person', pid: S.pid, tab: d.tabk }); return; }
+
+    switch (d.act) {
+      case 'ob-next': if (S.ob < OB.length - 1) { S.ob++; renderLayer(); } else { S.obDone = true; render(); } break;
+      case 'ob-prev': if (S.ob > 0) { S.ob--; renderLayer(); } break;
+      case 'ob-skip': case 'ob-done': S.obDone = true; render(); break;
+
+      case 'open': go({ view: 'person', pid: d.pid, tab: d.tab || 'aura' }); break;
+      case 'hback': goBack(); break;
+      case 'hfwd': goFwd(); break;
+      case 'drop': S.drop = d.v; render(); toast('Added to Your Side 🪞'); break;
+      case 'prep': sheet('prep'); break;
+      case 'invite': sheet('invite'); break;
+      case 'privacy': sheet('privacy'); break;
+      case 'wrapped': sheet('wrapped'); break;
+      case 'add': S.add = null; sheet('add'); break;
+      case 'dom': sheet('dom', { d: d.d }); break;
+      case 'evolve': evolve(); break;
+      case 'legend': sheet('legend'); break;
+      case 'close': S.sheet = null; renderLayer(); break;
+      case 'soon': toast('Works in the full app. Prototype stops here.'); break;
+      case 'remind': S.sheet = null; renderLayer(); toast('Reminder set for after the meeting ⏰'); break;
+      case 'copy': copy(P(S.pid).asks[+d.i].msg, 'Copied. Now send it 💬'); break;
+      case 'asked': toast('Nice. Tell us how it went after 🎯'); break;
+
+      case 'pick': pick(d.v); break;
+      case 'replay': S.game = { i: 0, picks: [] }; render(); break;
+      case 'share': sheet('share'); break;
+      case 'post': toast('Card saved. Post it anywhere ✨'); break;
+      case 'copylink': copy('https://peoplelens.example/guess/alex', 'Link copied 🔗 Send it to a friend'); break;
+      case 'myc': S.myCard[+d.i] = d.v; renderLayer(); break;
+
+      case 'note': S.note = { pid: d.pid || (S.view === 'person' ? S.pid : 'maya'), t: '', r: '', where: null, who: null, how: null, m: null }; sheet('note'); break;
+      case 'np': S.note.pid = d.v; renderLayer(); break;
+      case 'mom': {
+        const i = +d.i, m = MOMENTS[i], prev = S.note.m != null ? MOMENTS[S.note.m][1] : null;
+        if (S.note.m === i) { S.note.m = null; if (S.note.t === m[1]) S.note.t = ''; }
+        else { S.note.m = i; if (!S.note.t.trim() || S.note.t === prev) S.note.t = m[1]; }
+        renderLayer(); break;
+      }
+      case 'nf': S.note[d.f] = S.note[d.f] === d.v ? null : d.v; renderLayer(); break;
+      case 'ex': S.note.t = d.v; renderLayer(); break;
+      case 'toread': {
+        const c = CHECKS.find(x => x.k === 'trait'); const m = S.note.t.match(c.re);
+        if (m) { S.note.r = (S.note.r ? S.note.r + ' ' : '') + 'felt ' + m[0]; S.note.t = S.note.t.replace(c.re, '…').replace(/\s+/g, ' ').trim(); }
+        renderLayer(); toast('Moved to your read 💭 Now: what actually happened?'); break;
+      }
+      case 'toq': {
+        const p = P(S.note.pid); p.asks.push({ q: 'Is this true? "' + S.note.t + '"', msg: 'Hey, can I ask you something? I want to hear it from you, not from someone else.' });
+        S.sheet = null; renderLayer(); toast('Saved as a question for ' + p.n + ', not as a fact 🗣️'); break;
+      }
+      case 'nsave': {
+        const n = S.note, p = P(n.pid);
+        const m = n.m != null ? MOMENTS[n.m] : null;
+        p.notes.push({ d: m ? m[2] : 'comm', s: m ? m[3] : 'saw', t: n.t, w: 'Just now', read: n.r || undefined });
+        S.sheet = null; go({ view: 'person', pid: p.id, tab: 'notes' }); toast('Saved to ' + p.n + '\'s notebook 🔒'); break;
+      }
+
+      case 'actx': S.add.ctx = d.v; renderLayer(); break;
+      case 'aad': S.add.adult = d.v; renderLayer(); break;
+      case 'acreate': {
+        const id = 'x' + Date.now(); const nm = S.add.n.trim().split(/\s+/)[0];
+        PEOPLE.push({ id, n: nm, ctx: S.add.ctx, locked: true, notes: [], pats: [], asks: [{ q: 'What helps ' + nm + ' on a bad day?', msg: 'Random q: on a really bad day, what actually helps you? Company or space?' }] });
+        S.sheet = null; go({ view: 'person', pid: id, tab: 'aura' }); confetti(); toast(nm + '\'s character starts as a sketch ✏️ It grows as you check things with them.'); break;
+      }
+    }
+  });
+
+  render();
+  requestAnimationFrame(loop);
+})();
+</script>

@@ -1,0 +1,893 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EVERY1 Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Spectral:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a private psychological journal — chapters in roman numerals,
+   engraved medallion portraits, ruled margins, one brass accent.
+   Deliberately single-theme: ink-dark, like a bound notebook at night. */
+:root {
+  --ink: #0c0b0a;        /* page */
+  --plate: #151311;      /* raised surfaces */
+  --plate-2: #1c1916;
+  --bone: #ebe3d4;       /* text, engraving lines */
+  --ash: #a39a8c;        /* secondary text */
+  --dim: #6a6258;        /* captions, rules */
+  --rule: rgba(235, 227, 212, 0.12);
+  --brass: #c2a06c;      /* the one accent */
+  --brass-soft: rgba(194, 160, 108, 0.14);
+  --blood: #b0574c;      /* refusals only */
+  --blood-soft: rgba(176, 87, 76, 0.12);
+  --display: 'Cormorant Garamond', 'Cormorant', Garamond, 'Times New Roman', serif;
+  --body: 'Spectral', Georgia, 'Times New Roman', serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--ink); color: var(--bone); font-family: var(--body); font-size: 16px; line-height: 1.5; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+input, textarea { font: inherit; color: var(--bone); }
+:focus-visible { outline: 1px solid var(--brass); outline-offset: 3px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; margin: 0; letter-spacing: -0.01em; line-height: 1.04; text-wrap: balance; }
+p { margin: 0; }
+
+/* Frame: phone-shaped on wide screens, full-bleed on phones. */
+.stage { min-height: 100%; display: grid; place-items: start center; }
+@media (min-width: 520px) { .stage { padding-block: 28px; background: radial-gradient(60% 45% at 50% 0%, #1d1915 0%, var(--ink) 70%); } }
+.phone { position: relative; width: 100%; max-width: 420px; height: 100vh; height: 100dvh; background: var(--ink); overflow: hidden; overflow: clip; isolation: isolate; }
+@media (min-width: 520px) { .phone { height: 860px; border-radius: 40px; border: 1px solid var(--rule); box-shadow: 0 40px 120px rgba(0,0,0,0.7), 0 0 0 10px #050404; } }
+.phone::after { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 60; opacity: 0.08;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+.scroll { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; padding-inline: 22px; padding-block: calc(66px + env(safe-area-inset-top, 0px)) 120px; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+#view { display: flex; flex-direction: column; gap: 28px; }
+
+/* Top bar: back / title / forward */
+.topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 42; display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; gap: 8px;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 14px 10px; background: linear-gradient(var(--ink) 62%, rgba(12,11,10,0)); }
+.topbar button { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--rule); color: var(--bone); font-family: var(--mono); font-size: 1rem; text-align: center; transition: opacity .2s, border-color .2s; }
+.topbar button:not(:disabled):hover { border-color: var(--brass); }
+.topbar button:disabled { opacity: 0.25; cursor: default; }
+.topbar .ttl { text-align: center; font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ash); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Bottom bar */
+.nav { position: absolute; left: 0; right: 0; bottom: 0; z-index: 20; display: grid; grid-template-columns: repeat(5, 1fr); align-items: end;
+  padding: 10px 8px calc(14px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(rgba(12,11,10,0), var(--ink) 38%); }
+.nav button { display: grid; justify-items: center; gap: 6px; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim); padding-top: 8px; }
+.nav button i { width: 4px; height: 4px; border-radius: 50%; background: transparent; }
+.nav button[aria-current="page"] { color: var(--bone); }
+.nav button[aria-current="page"] i { background: var(--brass); }
+.nav .plus { justify-self: center; width: 52px; height: 52px; border-radius: 50%; border: 1px solid var(--brass); color: var(--brass); font-family: var(--display); font-size: 2rem; line-height: 1; display: grid; place-items: center; padding: 0; background: radial-gradient(circle, rgba(194,160,108,0.16), rgba(194,160,108,0) 70%); }
+.nav .plus:active { transform: scale(0.94); }
+
+/* Type helpers */
+.label { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim); }
+.label.brass { color: var(--brass); }
+.muted { color: var(--ash); }
+.small { font-size: 0.88rem; }
+.italic { font-style: italic; }
+.epigraph { font-family: var(--display); font-style: italic; font-weight: 500; font-size: 2.15rem; line-height: 1.08; text-wrap: balance; }
+.display-xl { font-size: 3.1rem; }
+.display-l { font-size: 2.2rem; }
+.display-m { font-size: 1.55rem; }
+.col { display: flex; flex-direction: column; gap: 12px; }
+.col-s { display: flex; flex-direction: column; gap: 6px; }
+.row { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.between { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.grow { flex: 1; min-width: 0; }
+.hr { height: 1px; background: var(--rule); border: 0; margin: 0; }
+.chapter { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: baseline; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+.chapter .num { font-family: var(--display); font-style: italic; color: var(--brass); font-size: 1.25rem; }
+.chapter h2 { font-size: 1.45rem; }
+
+/* Surfaces — used sparingly */
+.panel { background: var(--plate); border: 1px solid var(--rule); border-radius: 4px; padding: 18px; }
+.panel.brass { border-color: rgba(194,160,108,0.35); background: linear-gradient(180deg, rgba(194,160,108,0.07), rgba(194,160,108,0) 70%), var(--plate); }
+.tap { transition: background .15s, border-color .15s; }
+.tap:hover { border-color: rgba(235,227,212,0.25); }
+.tap:active { background: var(--plate-2); }
+.list > * + * { border-top: 1px solid var(--rule); }
+.list > * { padding-block: 14px; }
+
+.btn { display: block; width: 100%; text-align: center; padding: 15px 18px; border-radius: 2px; background: var(--bone); color: var(--ink); font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500; transition: opacity .15s; }
+.btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn-line { display: block; width: 100%; text-align: center; padding: 14px 18px; border-radius: 2px; border: 1px solid var(--rule); font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--bone); }
+.btn-line:hover { border-color: var(--brass); }
+.link { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brass); }
+.chip { padding: 8px 12px; border: 1px solid var(--rule); border-radius: 2px; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--ash); transition: all .15s; }
+.chip[aria-pressed="true"] { border-color: var(--brass); color: var(--bone); background: var(--brass-soft); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { display: inline-block; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; padding: 3px 7px; border: 1px solid var(--rule); color: var(--ash); border-radius: 2px; white-space: nowrap; }
+.tag.brass { border-color: rgba(194,160,108,0.5); color: var(--brass); }
+.tag.blood { border-color: rgba(176,87,76,0.5); color: var(--blood); }
+
+/* Medallions */
+canvas.etch { display: block; }
+.circle { display: flex; gap: 18px; overflow-x: auto; margin-inline: -22px; padding-inline: 22px; scrollbar-width: none; }
+.circle::-webkit-scrollbar { display: none; }
+.circle button { display: grid; justify-items: center; gap: 6px; flex: none; width: 76px; }
+.circle .nm { font-family: var(--display); font-size: 1.05rem; font-weight: 600; }
+.circle .dp { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.18em; color: var(--dim); text-transform: uppercase; }
+.add-ring { width: 72px; height: 72px; border-radius: 50%; border: 1px dashed var(--dim); display: grid; place-items: center; color: var(--ash); font-family: var(--display); font-size: 1.8rem; }
+
+/* Entries */
+.entry { display: grid; grid-template-columns: 74px 1fr; gap: 12px; }
+.entry .when { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.12em; color: var(--dim); text-transform: uppercase; padding-top: 4px; }
+.entry .kind { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brass); }
+.entry .read { font-style: italic; color: var(--ash); font-size: 0.92rem; }
+.theory-status { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; }
+
+/* Notes in the margin (screening) */
+.margin { border-left: 2px solid var(--brass); padding: 4px 0 4px 14px; font-size: 0.92rem; color: var(--bone); }
+.margin.stop { border-color: var(--blood); }
+.margin .label { display: block; margin-bottom: 4px; }
+
+.field { width: 100%; padding: 14px; border-radius: 2px; background: var(--plate); border: 1px solid var(--rule); font-size: 1rem; }
+textarea.field { min-height: 90px; resize: none; line-height: 1.45; }
+.field::placeholder { color: var(--dim); font-style: italic; }
+.field:focus { border-color: rgba(194,160,108,0.6); outline: none; }
+
+.moments { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid var(--rule); }
+.moments button { padding: 13px 4px; border-bottom: 1px solid var(--rule); font-family: var(--display); font-size: 1.15rem; font-weight: 600; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.moments button:nth-child(odd) { padding-right: 14px; border-right: 1px solid var(--rule); }
+.moments button:nth-child(even) { padding-left: 14px; }
+.moments button span { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.14em; color: var(--dim); text-transform: uppercase; }
+.moments button[aria-pressed="true"] { color: var(--brass); }
+.moments button[aria-pressed="true"] span { color: var(--brass); }
+
+/* Sheets */
+.sheet-back { position: absolute; inset: 0; background: rgba(5,4,3,0.72); z-index: 40; animation: fade .2s ease; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 86%; overflow-y: auto; z-index: 41; background: var(--plate); border-top: 1px solid rgba(194,160,108,0.35);
+  padding-inline: 22px; padding-block: 12px calc(32px + env(safe-area-inset-bottom, 0px)); animation: up .32s cubic-bezier(.2,.8,.2,1); scrollbar-width: none; }
+.sheet::-webkit-scrollbar { display: none; }
+.grab { width: 40px; height: 3px; background: var(--dim); margin: 2px auto 18px; }
+@keyframes up { from { transform: translateY(100%); } }
+@keyframes fade { from { opacity: 0; } }
+
+/* Onboarding */
+.ob { position: absolute; inset: 0; z-index: 50; background: var(--ink); display: flex; flex-direction: column; padding: calc(28px + env(safe-area-inset-top, 0px)) 28px calc(34px + env(safe-area-inset-bottom, 0px)); }
+.ob .bars { display: flex; gap: 6px; }
+.ob .bars i { flex: 1; height: 1px; background: var(--rule); }
+.ob .bars i.on { background: var(--brass); }
+.ob .art { flex: 1; display: grid; place-items: center; }
+.ob .copy { display: flex; flex-direction: column; gap: 18px; animation: rise .7s ease both; }
+@keyframes rise { from { opacity: 0.001; transform: translateY(10px); } }
+
+/* Mirror */
+.qcard { border: 1px solid var(--rule); background: var(--plate); padding: 26px 22px; display: flex; flex-direction: column; gap: 22px; min-height: 360px; justify-content: space-between; touch-action: pan-y; user-select: none; transition: transform .3s cubic-bezier(.2,.8,.2,1), opacity .25s; }
+.qcard h2 { font-size: 2.1rem; font-style: italic; font-weight: 500; }
+.opt { display: grid; grid-template-columns: 26px 1fr; gap: 10px; padding: 14px 0; border-top: 1px solid var(--rule); font-family: var(--display); font-size: 1.25rem; font-weight: 600; width: 100%; }
+.opt b { font-family: var(--mono); font-size: 0.7rem; color: var(--brass); font-weight: 500; padding-top: 6px; }
+.seal { display: flex; gap: 4px; }
+.seal i { flex: 1; height: 2px; background: var(--rule); }
+.seal i.on { background: var(--brass); }
+
+.certificate { position: relative; padding: 30px 24px; text-align: center; border: 1px solid rgba(194,160,108,0.5); background: radial-gradient(80% 60% at 50% 0%, rgba(194,160,108,0.12), rgba(194,160,108,0) 70%), var(--ink); display: flex; flex-direction: column; gap: 18px; align-items: center; }
+.certificate::before { content: ''; position: absolute; inset: 6px; border: 1px solid rgba(194,160,108,0.22); pointer-events: none; }
+
+.toast { position: absolute; left: 50%; bottom: 104px; transform: translateX(-50%); z-index: 70; background: var(--bone); color: var(--ink); font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; padding: 11px 16px; width: max-content; max-width: calc(100% - 44px); animation: toast .3s ease; }
+@keyframes toast { from { opacity: 0; transform: translate(-50%, 6px); } }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="stage">
+  <div class="phone" id="phone">
+    <div class="topbar" id="topbar">
+      <button id="hback" data-act="hback" aria-label="Back" title="Back">‹</button>
+      <span class="ttl" id="httl"></span>
+      <button id="hfwd" data-act="hfwd" aria-label="Forward" title="Forward">›</button>
+    </div>
+    <div class="scroll" id="scroll"><div id="view"></div></div>
+    <nav class="nav" id="nav" aria-label="Main">
+      <button data-nav="index"><i></i>Index</button>
+      <button data-nav="portraits"><i></i>Portraits</button>
+      <button class="plus" data-act="observe" aria-label="Record an observation">+</button>
+      <button data-nav="mirror"><i></i>Mirror</button>
+      <button data-nav="self"><i></i>Self</button>
+    </nav>
+    <div id="layer"></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const ROMAN = ['', 'I', 'II', 'III'];
+
+  /* ------------------------------------------------------------------
+   * Content. Sample people, clearly fictional.
+   * Areas are the blueprint's seven domains, named for this tone.
+   * ---------------------------------------------------------------- */
+  const AREAS = [
+    { k: 'comm', l: 'Speech', full: 'How they communicate' },
+    { k: 'conflict', l: 'Conflict', full: 'How disagreements go' },
+    { k: 'support', l: 'Strain', full: 'What helps under strain' },
+    { k: 'plans', l: 'Plans', full: 'Decisions and structure' },
+    { k: 'feedback', l: 'Critique', full: 'Giving and taking criticism' },
+    { k: 'social', l: 'Company', full: 'Connection and energy' },
+    { k: 'space', l: 'Boundaries', full: 'Time, privacy, saying no' }
+  ];
+  const KIND = { saw: 'Observed', said: 'They told me', tried: 'Tested', read: 'My read' };
+  const STATUS = {
+    untested: ['Untested', 'One occasion. A story until you check it.'],
+    emerging: ['Emerging', 'Seen more than once. Not yet checked with them.'],
+    confirmed: ['Confirmed twice', 'Two independent checks agree.'],
+    contested: ['Contested', 'Evidence on both sides.'],
+    abandoned: ['Abandoned', 'No longer fits.']
+  };
+
+  const PEOPLE = [
+    { id: 'sam', n: 'Sam', rel: 'Closest friend', joined: true, entries: [
+        { d: 'support', k: 'said', t: 'Said he needs an evening alone before he can talk about anything hard.', w: '3 Oct' },
+        { d: 'support', k: 'tried', t: 'Gave him the evening after the interview and called the next morning. He said that was exactly right.', w: '28 Sep' },
+        { d: 'conflict', k: 'saw', t: 'Sent a meme two days after our argument. Never mentioned the argument itself.', w: '19 Sep' },
+        { d: 'plans', k: 'tried', t: 'Asked whether he wanted Saturday planned. "Leave it open." It went well.', w: '12 Sep' },
+        { d: 'social', k: 'saw', t: 'Talked for an hour at the coffee place. Barely spoke at the party that night.', w: '6 Sep', r: 'Groups drain him faster than he lets on.' },
+        { d: 'space', k: 'said', t: 'Told me Sundays are for his family, full stop.', w: '30 Aug' },
+        { d: 'feedback', k: 'tried', t: 'Gave him blunt notes on his talk. He thanked me for not cushioning it.', w: '22 Aug' }
+      ],
+      theories: [
+        { d: 'support', when: 'he has a hard day', then: 'want an evening alone first, then company', s: 'confirmed', alt: ['He was still working out what he needed'] },
+        { d: 'conflict', when: 'we have argued', then: 'repair with something light rather than talk it through', s: 'emerging', alt: ['He assumes I want to move on', 'Talking about it feels like reopening it'] }
+      ],
+      questions: [{ q: 'Does he want me to raise arguments again later, or let them go?', ask: 'After we clash, what helps you get back to normal? I want to get better at that.' }] },
+
+    { id: 'maya', n: 'Maya', rel: 'Colleague', entries: [
+        { d: 'comm', k: 'saw', t: 'Asked "what\'s the headline?" twice while I was explaining the budget.', w: '7 Oct' },
+        { d: 'comm', k: 'tried', t: 'Led with the conclusion in the review. She engaged straight away.', w: '2 Oct' },
+        { d: 'feedback', k: 'saw', t: 'Went quiet for the rest of the meeting after the director questioned her numbers.', w: '25 Sep', r: 'She was embarrassed.' },
+        { d: 'plans', k: 'saw', t: 'Moved our deadline by email at 10pm, no explanation.', w: '18 Sep' }
+      ],
+      theories: [
+        { d: 'comm', when: 'I explain something at work', then: 'want the conclusion before the detail', s: 'emerging', alt: ['She was short on time that week', 'That is how the director runs meetings'] },
+        { d: 'feedback', when: 'she is questioned in front of others', then: 'go quiet for the rest of the meeting', s: 'untested', alt: ['She was thinking it through', 'The meeting simply moved on'] }
+      ],
+      questions: [{ q: 'How does she like to hear about changes to a plan?', ask: 'When plans change, is it better to tell you straight away even if it is not settled, or once it is clear?' }] },
+
+    { id: 'mum', n: 'Mum', rel: 'Mother', entries: [
+        { d: 'space', k: 'saw', t: 'Changed the subject twice when I mentioned moving abroad.', w: '5 Oct' },
+        { d: 'support', k: 'saw', t: 'Drove two hours with soup when I was ill. Said very little.', w: 'Aug', r: 'This is how she says she cares.' },
+        { d: 'conflict', k: 'said', t: 'Said she hates being told what to do "by her own children".', w: 'Jul' }
+      ],
+      theories: [{ d: 'support', when: 'someone she loves is struggling', then: 'show care by doing rather than saying', s: 'emerging', alt: ['Saying it out loud is hard for her generation'] }],
+      questions: [{ q: 'Is the move abroad off-limits, or is she just not ready yet?', ask: 'I have noticed we do not talk about the move. Is that something you would rather leave for now?' }] },
+
+    { id: 'dev', n: 'Dev', rel: 'Brother', entries: [
+        { d: 'social', k: 'saw', t: 'Reached out first after three quiet weeks. Suggested lunch.', w: '1 Oct' }
+      ], theories: [], questions: [{ q: 'Does he prefer that I make the plans?', ask: 'Do you like it when I sort the plans, or would you rather decide together?' }] },
+
+    { id: 'priya', n: 'Priya', rel: 'New friend', entries: [], theories: [], questions: [] }
+  ];
+  const P = id => PEOPLE.find(p => p.id === id);
+  const checked = p => p.entries.filter(e => e.k === 'said' || e.k === 'tried').length;
+  const depthOf = p => { const c = checked(p); return c >= 4 ? 3 : c >= 2 ? 2 : 1; };
+  const counts = p => { const c = {}; p.entries.forEach(e => { c[e.d] = (c[e.d] || 0) + 1; }); return c; };
+
+  const SELF = { id: 'self-alex', n: 'Alex', entries: ['support', 'plans', 'feedback', 'conflict', 'social', 'comm'].map(d => ({ d, k: 'said' })) };
+
+  /* Observation moments: each describes something someone did. */
+  const MOMENTS = [
+    ['Withdrew', 'conflict'], ['Replied briefly', 'comm'], ['Cancelled', 'plans'], ['Proposed a plan', 'plans'],
+    ['Confided in me', 'support', 'said'], ['Asked for space', 'support'], ['Helped unasked', 'support'], ['We disagreed', 'conflict'],
+    ['Reached out first', 'social'], ['Criticised directly', 'feedback'], ['Took criticism', 'feedback'], ['Declined', 'space']
+  ];
+
+  const EPIGRAPHS = [
+    'Under every reaction, a reason.',
+    'The quiet ones aren\'t empty. The loud ones aren\'t simple.',
+    'People show you who they are in small moments.',
+    'You\'ve known them for years. How much have you asked?',
+    'A theory you never test is a story you tell yourself.'
+  ];
+
+  const PROMPTS = [
+    { pid: 'maya', q: 'Maya went quiet after the director questioned her numbers. Has she gone quiet one-to-one, too?' },
+    { pid: 'mum', q: 'Mum changed the subject twice. What came just before, each time?' },
+    { pid: 'sam', q: 'Sam repairs with something light. Has there been a time he wanted to talk it through instead?' },
+    { pid: 'dev', q: 'Dev reached out first after three weeks. Who reached out the time before that?' }
+  ];
+
+  const GAME = [
+    { q: 'After a hard day, Sam wants…', a: 'Company, right away', b: 'Solitude first', sam: 'b', area: 'strain' },
+    { q: 'You cancel at the last minute. Sam…', a: 'Lets it go', b: 'Is quietly hurt', sam: 'a', area: 'plans' },
+    { q: 'A free Saturday. Sam would rather it be…', a: 'Planned', b: 'Left open', sam: 'b', area: 'plans' },
+    { q: 'Hard criticism. Sam wants it…', a: 'Softened', b: 'Plain', sam: 'b', area: 'critique' },
+    { q: 'After an argument, Sam…', a: 'Reaches out first', b: 'Waits', sam: 'a', area: 'conflict' }
+  ];
+
+  const CHECKS = [
+    { k: 'monitor', stop: true, re: /\b(track|follow(ed)? (her|him|them)|check(ed)? (her|his|their) phone|where (she|he|they) (goes|went|was)|who (she|he|they)('?s| is| are| was)? (texting|seeing|messaging))\b/i,
+      msg: 'EVERY1 doesn\'t record where someone goes, who they talk to, or what is on their phone. If something about this is worrying you, that is worth talking about with someone you trust.' },
+    { k: 'health', stop: true, re: /(\b(i think|probably|maybe|must be|seems?( to be)?|definitely|clearly)\b.{0,30}\b(depress\w*|adhd|autis\w*|bipolar|on the spectrum|ocd|narcissis\w*|psychopath\w*|sociopath\w*)\b)|(\b(she|he|they)('s| is| are)( a| an)? (depressed|adhd|autistic|bipolar|on the spectrum|ocd|narcissist\w*|psychopath\w*|sociopath\w*)\b)/i,
+      msg: 'Guesses about someone\'s health or mental state are never kept. What did you actually see them do or say?' },
+    { k: 'hearsay', re: /(\b(?!(?:He|She|They|We|I)\b)[A-Z][a-z]+ (said|says|told me) (that )?(he|she|they)\b)|(\b(my \w+|someone|people|everyone) (said|says|told me)\b)|(\b[Ii] heard (that )?(he|she|they)\b)|(\b[Aa]pparently,? (he|she|they)\b)/,
+      msg: 'Second-hand. It cannot count as something you observed, but it can become a question to find out.', q: true },
+    { k: 'trait', re: /\b(rude|lazy|selfish|needy|manipulative|controlling|toxic|passive[- ]aggressive|clingy|arrogant|cold|difficult)\b/i,
+      msg: 'That is a verdict, not an observation. What did they do or say? Your verdict can live in "my read", kept apart.', read: true }
+  ];
+
+  /* ------------------------------------------------------------------
+   * Engraved portraits.
+   *
+   * A classical bust drawn in engraving lines — the way banknotes and old
+   * book plates render a face. Brightness becomes line weight; lines bend
+   * over the form. The bust is generated from a random seed, so it carries
+   * no information about the person and predicts no one's face.
+   *
+   * Depth (I–III) comes from CHECKED entries — what they told you, what you
+   * tested — never from how much you wrote. The ring of seven arcs shows
+   * which areas you have observed anything in.
+   * ---------------------------------------------------------------- */
+  function hashStr(s) { let h = 2166136261 >>> 0; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; } return h; }
+  function mulberry(a) { return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+  function bustFor(seed) {
+    const r = mulberry(hashStr(seed));
+    return { hx: 0.5 + (r() - 0.5) * 0.03, hy: 0.39 + (r() - 0.5) * 0.02, rx: 0.148 + r() * 0.022, ry: 0.198 + r() * 0.02,
+      turn: (r() - 0.5) * 0.7, hair: Math.floor(r() * 4), sw: 0.36 + r() * 0.07, st: 0.735 + r() * 0.02 };
+  }
+
+  const L = (() => { const v = [-0.55, -0.52, 0.65]; const m = Math.hypot(...v); return v.map(x => x / m); })();
+  const lit = (nx, ny, nz) => Math.max(0, nx * L[0] + ny * L[1] + nz * L[2]);
+
+  // Returns [brightness 0..1, surface height 0..1] at (x, y) in a unit box.
+  function field(b, x, y) {
+    const dx0 = (x - b.hx) / b.rx, dy = (y - b.hy) / b.ry;
+    const fx = b.turn * 0.42;
+
+    // Hair cap (front of head)
+    const hdx = (x - b.hx) / (b.rx * 1.13), hdy = (y - (b.hy - b.ry * 0.12)) / (b.ry * 0.97);
+    const hr2 = hdx * hdx + hdy * hdy;
+    const hairline = -0.42 + 0.34 * dx0 * dx0;
+    if (hr2 < 1 && dy < hairline) {
+      const nz = Math.sqrt(1 - hr2);
+      const strand = 0.9 + 0.1 * Math.sin(x * 70 + y * 25 + Math.sin(x * 18) * 3);
+      return [(0.08 + 0.62 * lit(hdx, hdy, nz)) * strand, nz * 1.05];
+    }
+    if (b.hair === 2) { // gathered at the back
+      const bx = (x - (b.hx - b.turn * b.rx * 0.9)) / (b.rx * 0.48), by = (y - (b.hy - b.ry * 1.02)) / (b.rx * 0.48);
+      const br2 = bx * bx + by * by;
+      if (br2 < 1) { const nz = Math.sqrt(1 - br2); return [(0.08 + 0.6 * lit(bx, by, nz)) * (0.8 + 0.2 * Math.sin(x * 160 - y * 60)), nz * 0.9]; }
+    }
+
+    // Face — the ellipse narrows towards the jaw
+    const taper = 1 - 0.24 * Math.max(0, dy) * Math.max(0, dy);
+    const dx = dx0 / taper, r2 = dx * dx + dy * dy;
+    if (r2 < 1) {
+      const nz = Math.sqrt(1 - r2);
+      let v = 0.1 + 0.9 * lit(dx, dy, nz);
+      for (const s of [-1, 1]) {   // eye sockets, in shade
+        const ex = fx + s * 0.36, d = ((dx - ex) / 0.24) ** 2 + ((dy + 0.06) / 0.13) ** 2;
+        if (d < 1) v *= 0.3 + 0.7 * d;
+      }
+      if (dy > -0.27 && dy < -0.17) v = Math.min(1, v * 1.12);                          // brow ridge
+      const nd = dx - fx;
+      if (Math.abs(nd) < 0.07 && dy > -0.06 && dy < 0.32) v = Math.min(1, v + 0.2 * (1 - Math.abs(nd) / 0.07)); // nose ridge
+      if (nd > 0.07 && nd < 0.17 && dy > 0.04 && dy < 0.32) v *= 0.68;                   // nose shadow
+      if (dy > 0.31 && dy < 0.38 && Math.abs(nd) < 0.14) v *= 0.55;                      // under the nose
+      if (dy > 0.5 && dy < 0.555 && Math.abs(nd) < 0.27) v *= 0.5;                       // mouth line
+      if (dy > 0.84) v *= 0.82;
+      return [v, nz];
+    }
+
+    // Long hair, behind the face
+    if (b.hair === 1 && Math.abs(x - b.hx) < b.rx * 1.18 && y > b.hy - b.ry * 0.2 && y < b.st + 0.07) {
+      const sx = (x - b.hx) / (b.rx * 1.18);
+      return [(0.12 + 0.42 * lit(sx, 0.1, Math.sqrt(Math.max(0, 1 - sx * sx)))) * (0.7 + 0.3 * Math.sin(x * 150 + y * 8)), 0.35];
+    }
+
+    // Neck
+    const nw = b.rx * 0.64;
+    if (Math.abs(x - b.hx) < nw && y > b.hy + b.ry * 0.55 && y < b.st + 0.05) {
+      const nx = (x - b.hx) / nw, nz = Math.sqrt(Math.max(0, 1 - nx * nx));
+      const shade = y < b.hy + b.ry * 1.18 ? 0.45 : 0.82;
+      return [(0.08 + 0.6 * lit(nx, 0, nz)) * shade, nz * 0.55];
+    }
+
+    // Shoulders
+    const tx = (x - 0.5) / b.sw, ty = (y - (b.st + 0.36)) / 0.37;
+    const t2 = tx * tx + ty * ty;
+    if (t2 < 1 && y > b.st - 0.02) {
+      const nz = Math.sqrt(1 - t2);
+      let v = 0.08 + 0.68 * lit(tx, ty, nz);
+      if (Math.abs(x - b.hx) < (y - b.st) * 0.55 && y < b.st + 0.15) v *= 0.5;             // collar
+      return [v, nz * 0.8];
+    }
+
+    // Ground: faint, lit from the upper left
+    const g = Math.hypot(x - 0.22, y - 0.18);
+    return [0.05 + 0.1 * Math.max(0, 1 - g * 1.4), 0];
+  }
+
+  const DEPTH = {
+    1: { lines: 44, gamma: 1.5, gain: 0.62, amp: 0.6, ink: '#8c8478' },
+    2: { lines: 66, gamma: 1.12, gain: 0.95, amp: 1.5, ink: '#ebe3d4' },
+    3: { lines: 86, gamma: 1.0, gain: 1.05, amp: 1.8, ink: null }
+  };
+
+  function drawEtching(ctx, S, b, depth, reveal) {
+    const cfg = DEPTH[depth], R = S * 0.4, cx = S / 2, cy = S / 2;
+    const box = 2 * R, ox = cx - R, oy = cy - R;
+    const sp = box / cfg.lines, steps = Math.max(60, Math.round(box / 1.6));
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.clip();
+    if (cfg.ink) ctx.fillStyle = cfg.ink;
+    else { const g = ctx.createLinearGradient(ox, oy, ox + box, oy + box); g.addColorStop(0, '#f3ecdf'); g.addColorStop(0.55, '#e4d7bf'); g.addColorStop(1, '#c2a06c'); ctx.fillStyle = g; }
+    const maxRow = Math.ceil(cfg.lines * (reveal == null ? 1 : reveal));
+    for (let i = 0; i < maxRow; i++) {
+      const y0 = (i + 0.5) / cfg.lines;
+      const top = [], bot = [];
+      for (let j = 0; j <= steps; j++) {
+        const x = j / steps;
+        const [v, h] = field(b, x, y0);
+        const w = Math.pow(Math.min(1, v * cfg.gain), cfg.gamma) * sp * 0.92;
+        const y = oy + y0 * box - h * sp * cfg.amp;
+        top.push([ox + x * box, y - w / 2]); bot.push([ox + x * box, y + w / 2]);
+      }
+      ctx.beginPath(); ctx.moveTo(top[0][0], top[0][1]);
+      for (const p of top) ctx.lineTo(p[0], p[1]);
+      for (let k = bot.length - 1; k >= 0; k--) ctx.lineTo(bot[k][0], bot[k][1]);
+      ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawRing(ctx, S, cnt, mini) {
+    const cx = S / 2, cy = S / 2, n = AREAS.length, gap = 0.07, span = (Math.PI * 2) / n;
+    const unit = S / 300;
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = 'rgba(235,227,212,0.16)'; ctx.lineWidth = Math.max(1, unit);
+    ctx.beginPath(); ctx.arc(cx, cy, S * 0.415, 0, Math.PI * 2); ctx.stroke();
+    if (!mini) { ctx.beginPath(); ctx.arc(cx, cy, S * 0.495, 0, Math.PI * 2); ctx.stroke(); }
+    AREAS.forEach((a, i) => {
+      const a0 = -Math.PI / 2 + i * span + gap, a1 = a0 + span - gap * 2, c = cnt[a.k] || 0;
+      if (mini) {
+        ctx.beginPath(); ctx.arc(cx, cy, S * 0.465, a0, a1);
+        ctx.strokeStyle = c ? 'rgba(194,160,108,' + Math.min(1, 0.55 + c * 0.15) + ')' : 'rgba(235,227,212,0.12)';
+        ctx.lineWidth = Math.max(1.5, S * 0.03); ctx.stroke();
+        return;
+      }
+      if (!c) {
+        ctx.setLineDash([unit * 1.5, unit * 5]); ctx.strokeStyle = 'rgba(235,227,212,0.22)'; ctx.lineWidth = Math.max(1, unit * 1.2);
+        ctx.beginPath(); ctx.arc(cx, cy, S * 0.455, a0, a1); ctx.stroke(); ctx.setLineDash([]);
+        return;
+      }
+      // Guilloché: interlaced strands, denser the more you have observed.
+      const strands = Math.min(5, 2 + c), mid = S * 0.455, amp = S * 0.026;
+      ctx.strokeStyle = 'rgba(194,160,108,' + Math.min(0.95, 0.55 + c * 0.1) + ')'; ctx.lineWidth = Math.max(0.8, unit * 0.9);
+      for (let s = 0; s < strands; s++) {
+        ctx.beginPath();
+        for (let t = 0; t <= 120; t++) {
+          const th = a0 + (a1 - a0) * (t / 120);
+          const rr = mid + amp * Math.sin(th * 46 + (s * Math.PI * 2) / strands);
+          const px = cx + Math.cos(th) * rr, py = cy + Math.sin(th) * rr;
+          t ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+        }
+        ctx.stroke();
+      }
+    });
+    ctx.restore();
+  }
+
+  const CACHE = new Map();
+  function paintEtch(cv) {
+    const p = cv.dataset.pid === SELF.id ? SELF : P(cv.dataset.pid);
+    if (!p) return;
+    const size = +cv.dataset.size || 72, dpr = Math.min(2, window.devicePixelRatio || 1), S = Math.round(size * dpr);
+    const depth = +(cv.dataset.depth || depthOf(p)), ring = cv.dataset.ring || 'mini';
+    const key = [p.id, size, dpr, depth, ring, JSON.stringify(counts(p))].join('|');
+    cv.width = S; cv.height = S; cv.style.width = size + 'px'; cv.style.height = size + 'px';
+    const ctx = cv.getContext('2d');
+    let img = CACHE.get(key);
+    if (!img) {
+      img = document.createElement('canvas'); img.width = S; img.height = S;
+      const c2 = img.getContext('2d');
+      drawEtching(c2, S, bustFor(p.id), depth, null);
+      if (ring !== 'none') drawRing(c2, S, counts(p), ring === 'mini');
+      CACHE.set(key, img);
+    }
+    ctx.drawImage(img, 0, 0);
+  }
+  function paintAll() { document.querySelectorAll('canvas.etch').forEach(paintEtch); }
+
+  /* "Watch it deepen": I → II → III, each depth engraved top to bottom. */
+  function deepen(cv) {
+    if (!cv || cv._busy) return;
+    const p = P(cv.dataset.pid); if (!p) return;
+    cv._busy = true;
+    const S = cv.width, ctx = cv.getContext('2d'), b = bustFor(p.id), cnt = counts(p);
+    const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const plan = [[1, 600], [2, 900], [3, 900]];
+    let k = 0, t0 = null;
+    const frame = ts => {
+      if (t0 === null) t0 = ts;
+      const [d, dur] = plan[k], prog = reduced ? 1 : Math.min(1, (ts - t0) / dur);
+      ctx.clearRect(0, 0, S, S);
+      if (k > 0) drawEtching(ctx, S, b, plan[k - 1][0], null);
+      ctx.save(); ctx.globalCompositeOperation = 'source-over';
+      if (k > 0) { ctx.beginPath(); ctx.rect(0, 0, S, S * (0.1 + 0.8 * prog)); ctx.clip(); ctx.clearRect(0, 0, S, S * (0.1 + 0.8 * prog)); }
+      drawEtching(ctx, S, b, d, k === 0 ? prog : null);
+      ctx.restore();
+      drawRing(ctx, S, cnt, false);
+      if (prog >= 1) { k++; t0 = null; if (k >= plan.length) { setTimeout(() => { cv._busy = false; paintEtch(cv); }, 900); return; } }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }
+
+  const medal = (p, size, ring) => '<canvas class="etch" data-pid="' + p.id + '" data-size="' + size + '" data-ring="' + (ring || 'mini') + '" role="img" aria-label="Engraved portrait of ' + esc(p.n) + ', depth ' + ROMAN[depthOf(p)] + '"></canvas>';
+
+  /* ------------------------------------------------------------------
+   * State and history.
+   * ---------------------------------------------------------------- */
+  const S = { view: 'index', pid: null, tab: 'observed', ob: 0, obDone: false, sheet: null, prompt: 0, game: { i: 0, picks: [] }, note: null };
+  const HIST = [{ view: 'index', pid: null, tab: 'observed' }];
+  let HI = 0, useHist = true;
+  try { history.replaceState({ hi: 0 }, ''); } catch (e) { useHist = false; }
+  function apply(s) { S.view = s.view; S.pid = s.pid; S.tab = s.tab; S.sheet = null; $('scroll').scrollTop = 0; render(); }
+  function go(next) {
+    const cur = HIST[HI];
+    const snap = { view: next.view, pid: next.pid !== undefined ? next.pid : S.pid, tab: next.tab || (next.view === S.view ? S.tab : 'observed') };
+    if (cur.view === snap.view && cur.pid === snap.pid && cur.tab === snap.tab) { S.sheet = null; render(); return; }
+    HIST.splice(HI + 1); HIST.push(snap); HI++;
+    if (useHist) { try { history.pushState({ hi: HI }, ''); } catch (e) { useHist = false; } }
+    apply(snap);
+  }
+  function back() { if (S.sheet) { S.sheet = null; renderLayer(); return; } if (HI === 0) return; if (useHist) history.back(); else { HI--; apply(HIST[HI]); } }
+  function fwd() { if (HI >= HIST.length - 1) return; if (useHist) history.forward(); else { HI++; apply(HIST[HI]); } }
+  window.addEventListener('popstate', e => { const hi = e.state && typeof e.state.hi === 'number' ? e.state.hi : 0; if (hi >= 0 && hi < HIST.length) { HI = hi; apply(HIST[HI]); } });
+
+  /* ------------------------------------------------------------------
+   * Onboarding — four pages, epigraphs first.
+   * ---------------------------------------------------------------- */
+  const OB = [
+    { h: 'Under every reaction, <em>a reason.</em>', p: 'EVERY1 is a private journal for understanding the people who shape your life.' },
+    { h: 'The quiet ones aren\'t empty. <em>The loud ones aren\'t simple.</em>', p: 'Record what people actually do. Keep your verdicts apart. Watch patterns surface.' },
+    { h: 'A theory you never test is <em>a story you tell yourself.</em>', p: 'Every pattern carries another explanation, and stays a theory until you check it — by asking.' },
+    { h: 'What you write <em>stays yours.</em>', p: 'No one is watched. Nothing is shared. Nothing trains a machine. Portraits are engravings, never their face.' }
+  ];
+  function onboarding() {
+    const s = OB[S.ob];
+    const art = S.ob === 0 || S.ob === 3 ? '<canvas class="etch" data-pid="sam" data-size="230" data-ring="full" aria-hidden="true"></canvas>'
+      : S.ob === 1 ? '<div class="col" style="width:100%">' + ['Observed · replied in one line: "fine."', 'Observed · called ten minutes later', 'My read · <span class="italic">annoyed with me?</span>'].map(t => '<div class="panel small">' + t + '</div>').join('') + '</div>'
+      : '<div class="panel brass col" style="width:100%"><span class="label brass">Theory · Emerging</span><p class="display-m" style="font-family:var(--display)">When she\'s rushed, she replies in one line.</p><p class="small muted italic">Other explanation: that is how she writes to everyone.</p></div>';
+    return '<div class="ob"><div class="bars">' + OB.map((_, i) => '<i class="' + (i <= S.ob ? 'on' : '') + '"></i>').join('') + '</div>' +
+      '<div class="between" style="margin-top:14px"><span class="label">EVERY1</span><button class="label" data-act="ob-skip">Skip</button></div>' +
+      '<div class="art">' + art + '</div>' +
+      '<div class="copy" key="' + S.ob + '"><h1 class="epigraph" style="font-size:2.5rem">' + s.h + '</h1><p class="muted">' + s.p + '</p>' +
+      '<button class="btn" data-act="ob-next">' + (S.ob === OB.length - 1 ? 'Begin' : 'Continue') + '</button></div></div>';
+  }
+
+  /* ------------------------------------------------------------------
+   * Index (home).
+   * ---------------------------------------------------------------- */
+  function index() {
+    const day = new Date();
+    const ep = EPIGRAPHS[(day.getDate() + day.getMonth()) % EPIGRAPHS.length];
+    const pr = PROMPTS[S.prompt % PROMPTS.length], pp = P(pr.pid);
+    const unresolved = [];
+    PEOPLE.forEach(p => {
+      p.theories.filter(t => t.s === 'untested' || t.s === 'emerging').forEach(t => unresolved.push({ p, kind: 'Theory · ' + STATUS[t.s][0], t: 'When ' + t.when + ', ' + p.n + ' tends to ' + t.then + '.' }));
+      p.questions.forEach(q => unresolved.push({ p, kind: 'Unanswered', t: q.q }));
+    });
+    return '<header class="col-s">' +
+        '<div class="between"><span class="label">' + day.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }) + '</span><span class="label">Entry ' + (40 + PEOPLE.reduce((a, p) => a + p.entries.length, 0)) + '</span></div>' +
+        '<p class="epigraph" style="margin-top:14px">' + esc(ep) + '</p>' +
+      '</header>' +
+
+      '<section class="col"><div class="between"><span class="label">Your circle</span><button class="link" data-nav="portraits">All portraits</button></div>' +
+        '<div class="circle">' + PEOPLE.map(p => '<button data-act="open" data-pid="' + p.id + '">' + medal(p, 72) + '<span class="nm">' + esc(p.n) + '</span><span class="dp">Depth ' + ROMAN[depthOf(p)] + '</span></button>').join('') +
+        '<button data-act="add"><span class="add-ring">+</span><span class="nm muted">Add</span><span class="dp">&nbsp;</span></button></div></section>' +
+
+      '<section class="panel brass col">' +
+        '<div class="between"><span class="label brass">Today\'s question</span><span class="label">' + esc(pp.n) + '</span></div>' +
+        '<p style="font-family:var(--display);font-size:1.6rem;font-weight:600;line-height:1.15">' + esc(pr.q) + '</p>' +
+        '<div class="row" style="gap:10px"><button class="btn" style="flex:1" data-act="observe" data-pid="' + pp.id + '">Record it</button><button class="btn-line" style="flex:1" data-act="another">Another</button></div>' +
+      '</section>' +
+
+      '<section class="col"><div class="between"><span class="label">Unresolved</span><span class="label">' + unresolved.length + '</span></div>' +
+        '<div class="list">' + unresolved.slice(0, 4).map(u => '<button class="col-s" style="width:100%" data-act="open" data-pid="' + u.p.id + '" data-tab="' + (u.kind === 'Unanswered' ? 'unanswered' : 'theories') + '">' +
+          '<span class="between"><span class="label brass">' + esc(u.kind) + '</span><span class="label">' + esc(u.p.n) + '</span></span><span style="font-size:1.02rem">' + esc(u.t) + '</span></button>').join('') + '</div></section>' +
+
+      '<section class="panel tap col" data-nav="mirror" role="button" tabindex="0" style="cursor:pointer">' +
+        '<span class="label brass">The Mirror · sealed</span>' +
+        '<p style="font-family:var(--display);font-size:1.5rem;font-weight:600;line-height:1.15">Sam has answered five questions about himself. Your guesses stay sealed until you finish.</p>' +
+        '<div class="seal">' + GAME.map(() => '<i class="on"></i>').join('') + '</div><span class="label">His half complete · yours waiting</span>' +
+      '</section>' +
+
+      '<section class="col-s"><span class="label">This month</span>' +
+        '<p class="muted">You tested four theories instead of keeping them. You abandoned one. <button class="link" data-act="review">Read the review</button></p></section>';
+  }
+
+  /* ------------------------------------------------------------------
+   * Portraits.
+   * ---------------------------------------------------------------- */
+  function portraits() {
+    return '<header class="col-s"><span class="label">' + PEOPLE.length + ' of 25</span><h1 class="display-xl">Portraits</h1><p class="muted">The people you are trying to understand. Only you can see these pages, and nobody has to join for you to keep one.</p></header>' +
+      '<div class="list">' + PEOPLE.map(p => {
+        const th = p.theories.length, last = p.entries[0] ? p.entries[0].w : '—';
+        return '<button class="row" style="width:100%;gap:16px" data-act="open" data-pid="' + p.id + '">' + medal(p, 76) +
+          '<span class="grow col-s"><span class="between"><span style="font-family:var(--display);font-size:1.5rem;font-weight:600">' + esc(p.n) + '</span><span class="label">Depth ' + ROMAN[depthOf(p)] + '</span></span>' +
+          '<span class="muted italic small">' + esc(p.rel) + (p.joined ? ' · in the Mirror with you' : '') + '</span>' +
+          '<span class="label">' + p.entries.length + ' entries · ' + th + ' ' + (th === 1 ? 'theory' : 'theories') + '</span></span></button>';
+      }).join('') +
+      '<button class="row" style="width:100%;gap:16px" data-act="add"><span class="add-ring" style="width:76px;height:76px">+</span><span class="col-s"><span style="font-family:var(--display);font-size:1.4rem;font-weight:600">Begin a portrait</span><span class="muted small italic">A first name is enough. No photos, no surnames, no numbers.</span></span></button></div>';
+  }
+
+  /* ------------------------------------------------------------------
+   * A portrait.
+   * ---------------------------------------------------------------- */
+  function person() {
+    const p = P(S.pid), d = depthOf(p), cnt = counts(p), c = checked(p);
+    const hint = d === 3 ? 'Fully engraved. You have checked a great deal with ' + esc(p.n) + ' directly.'
+      : (d === 2 ? 4 - c : 2 - c) + ' more thing' + ((d === 2 ? 4 - c : 2 - c) === 1 ? '' : 's') + ' they tell you, or that you test, will deepen this portrait.';
+    const tabs = [['observed', 'I', 'Observed'], ['theories', 'II', 'Theories'], ['unanswered', 'III', 'Open'], ['find', 'IV', 'Find out']];
+    let body = '';
+    if (S.tab === 'observed') {
+      body = p.entries.length ? '<div class="list">' + p.entries.map(e => {
+        const a = AREAS.find(x => x.k === e.d);
+        return '<div class="entry"><span class="when">' + esc(e.w) + '<br>' + esc(a.l) + '</span><div class="col-s"><span class="kind">' + KIND[e.k] + '</span><p>' + esc(e.t) + '</p>' + (e.r ? '<p class="read">My read: ' + esc(e.r) + '</p>' : '') + '</div></div>';
+      }).join('') + '</div>' : '<p class="muted italic">No entries yet. What is one thing ' + esc(p.n) + ' did or said recently? The moment, not the verdict.</p>';
+    } else if (S.tab === 'theories') {
+      body = p.theories.length ? p.theories.map(t => '<article class="panel col">' +
+          '<div class="between"><span class="theory-status" style="color:' + (t.s === 'confirmed' ? 'var(--brass)' : t.s === 'contested' ? 'var(--blood)' : 'var(--ash)') + '">' + STATUS[t.s][0] + '</span><span class="label">' + AREAS.find(a => a.k === t.d).l + '</span></div>' +
+          '<p style="font-family:var(--display);font-size:1.45rem;font-weight:600;line-height:1.15">When ' + esc(t.when) + ', ' + esc(p.n) + ' tends to ' + esc(t.then) + '.</p>' +
+          '<p class="small muted">' + STATUS[t.s][1] + '</p>' +
+          '<div class="col-s"><span class="label">Other explanations</span>' + t.alt.map(a => '<p class="small italic">— ' + esc(a) + '</p>').join('') + '</div>' +
+          (t.s !== 'confirmed' ? '<div class="row" style="gap:10px"><button class="btn-line" style="flex:1" data-act="tab" data-tab="find">Test it</button><button class="btn-line" style="flex:1" data-act="abandon">Abandon</button></div>' : '') +
+        '</article>').join('') : '<p class="muted italic">No theories yet. When you notice the same thing twice, write it as "when this, they tend to that" — with another explanation beside it.</p>';
+    } else if (S.tab === 'unanswered') {
+      body = p.questions.length ? '<div class="list">' + p.questions.map((q, i) => '<div class="col-s"><p style="font-family:var(--display);font-size:1.35rem;font-weight:600;line-height:1.15">' + esc(q.q) + '</p>' +
+          '<p class="small muted">Only ' + esc(p.n) + ' can answer this. A way to ask:</p><p class="italic">"' + esc(q.ask) + '"</p>' +
+          '<div class="row" style="gap:14px;margin-top:4px"><button class="link" data-act="copy" data-i="' + i + '">Copy wording</button><button class="link" data-act="asked">I asked</button></div></div>').join('') + '</div>'
+        : '<p class="muted italic">Nothing unanswered yet.</p>';
+    } else {
+      const ideas = [['Ask how they like to hear criticism', 'Critique', 'At a calm moment, unrelated to any issue.'], ['Listen, or help?', 'Strain', 'Next time they bring you a problem, ask early which they want.'], ['After friction, ask what helps', 'Conflict', 'Once things are calm. Never mid-argument.']];
+      body = '<p class="small muted">Small, ordinary ways to find out. The rule for every one: if ' + esc(p.n) + ' later learned exactly what you did and why, they should feel respected.</p>' +
+        '<div class="list">' + ideas.map(([t, a, s]) => '<div class="col-s"><span class="between"><span style="font-family:var(--display);font-size:1.3rem;font-weight:600">' + t + '</span><span class="label">' + a + '</span></span><p class="small muted">' + s + '</p></div>').join('') + '</div>';
+    }
+    return '<header class="col" style="align-items:center;text-align:center;gap:10px">' +
+        '<button data-act="deepen" aria-label="Watch the portrait deepen" style="position:relative">' + medal(p, 270, 'full').replace('class="etch"', 'class="etch" id="bigpc"') + '</button>' +
+        '<div class="row" style="justify-content:center;flex-wrap:wrap;gap:6px 10px">' + AREAS.map(a => '<button class="label" data-act="area" data-a="' + a.k + '" style="color:' + (cnt[a.k] ? 'var(--brass)' : 'var(--dim)') + '">' + a.l + (cnt[a.k] ? ' ' + cnt[a.k] : '') + '</button>').join('<span class="label">·</span>') + '</div>' +
+        '<h1 class="display-xl" style="margin-top:6px">' + esc(p.n) + '</h1>' +
+        '<p class="italic muted">' + esc(p.rel) + (p.joined ? ' · in the Mirror with you' : '') + '</p>' +
+        '<div class="row" style="justify-content:center;gap:8px"><span class="tag brass">Depth ' + ROMAN[d] + ' of III</span><span class="tag">Private</span></div>' +
+        '<p class="small muted" style="max-width:300px">' + hint + ' <button class="link" data-act="deepen">Watch it deepen</button></p>' +
+      '</header>' +
+      '<nav class="row" style="gap:0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)" aria-label="Chapters">' + tabs.map(([k, n, l]) => '<button data-act="tab" data-tab="' + k + '" aria-current="' + (S.tab === k) + '" style="flex:1;text-align:center;padding:12px 2px;' + (S.tab === k ? 'color:var(--bone);box-shadow:inset 0 -1px 0 var(--brass)' : 'color:var(--dim)') + '"><span style="font-family:var(--display);font-style:italic;color:var(--brass)">' + n + '</span> <span class="label" style="color:inherit;letter-spacing:.12em">' + l + '</span></button>').join('') + '</nav>' +
+      '<section class="col">' + body + '</section>' +
+      '<button class="btn" data-act="observe" data-pid="' + p.id + '">Record an observation</button>';
+  }
+
+  /* ------------------------------------------------------------------
+   * The Mirror — sealed guesses, no score.
+   * ---------------------------------------------------------------- */
+  function mirror() {
+    const g = S.game;
+    if (g.i >= GAME.length) return reveal();
+    const c = GAME[g.i];
+    return '<header class="col-s"><span class="label brass">The Mirror · with Sam</span><h1 class="display-l">How would Sam answer?</h1><p class="muted small">He has answered for himself. Your guesses stay sealed until you finish — then both open at once.</p></header>' +
+      '<div class="seal">' + GAME.map((_, i) => '<i class="' + (i < g.i ? 'on' : '') + '"></i>').join('') + '</div>' +
+      '<article class="qcard" id="qcard"><span class="label">' + ROMAN[0] + (g.i + 1) + ' of ' + GAME.length + '</span><h2>' + esc(c.q) + '</h2>' +
+        '<div><button class="opt" data-act="pick" data-v="a"><b>A</b>' + esc(c.a) + '</button><button class="opt" data-act="pick" data-v="b"><b>B</b>' + esc(c.b) + '</button></div></article>' +
+      '<p class="label" style="text-align:center">Swipe or choose · there is no score</p>';
+  }
+  function reveal() {
+    const g = S.game;
+    const clear = GAME.filter((c, i) => g.picks[i] === c.sam), miss = GAME.filter((c, i) => g.picks[i] !== c.sam);
+    const row = (c, i) => '<div class="col-s"><p style="font-family:var(--display);font-size:1.25rem;font-weight:600">' + esc(c.q) + '</p><p class="small"><span class="label">Sam</span> ' + esc(c[c.sam]) +
+      (g.picks[GAME.indexOf(c)] !== c.sam ? ' &nbsp; <span class="label">You guessed</span> <span class="muted">' + esc(c[g.picks[GAME.indexOf(c)]]) + '</span>' : '') + '</p></div>';
+    return '<header class="col-s"><span class="label brass">The Mirror · unsealed</span><h1 class="display-l">What each of you said.</h1><p class="muted small">No score. The surprises are the useful part.</p></header>' +
+      (clear.length ? '<section class="col"><div class="chapter"><span class="num">I</span><h2>Seen clearly</h2></div><div class="list">' + clear.map(row).join('') + '</div></section>' : '') +
+      (miss.length ? '<section class="col"><div class="chapter"><span class="num">II</span><h2>Not as you expected</h2></div><div class="list">' + miss.map(row).join('') + '</div>' +
+        '<div class="margin"><span class="label brass">Worth a conversation</span>"' + esc(miss[0].q) + '" You guessed ' + esc(miss[0][g.picks[GAME.indexOf(miss[0])]].toLowerCase()) + '; he said ' + esc(miss[0][miss[0].sam].toLowerCase()) + '. Ask him about it rather than filing it away.</div></section>' : '') +
+      '<div class="col"><button class="btn" data-act="certificate">Make our page</button><button class="btn-line" data-act="replay">Begin again</button></div>';
+  }
+  function certificateSheet() {
+    const g = S.game;
+    const clear = [...new Set(GAME.filter((c, i) => g.picks[i] === c.sam).map(c => c.area))].slice(0, 2);
+    const miss = GAME.find((c, i) => g.picks[i] !== c.sam);
+    return '<div class="grab"></div><div class="certificate">' +
+        '<span class="label brass">EVERY1 · The Mirror</span>' +
+        '<div class="row" style="gap:10px;justify-content:center">' + medal(SELF, 92, 'none') + '<span style="font-family:var(--display);font-size:1.6rem;color:var(--brass)">&amp;</span>' + medal(P('sam'), 92, 'none') + '</div>' +
+        '<h2 class="epigraph" style="font-size:2rem">Alex &amp; Sam</h2>' +
+        '<p style="font-family:var(--display);font-size:1.35rem;font-weight:600;line-height:1.2">' + (clear.length ? 'Read each other clearly on ' + esc(clear.join(' and ')) + '.' : 'Surprised each other.') + '</p>' +
+        (miss ? '<p class="small muted">The surprise: ' + esc(miss.q.replace('…', '')) + ' ' + esc(miss[miss.sam].toLowerCase()) + '.</p>' : '') +
+        '<p class="label">Both chose to play · no scores</p></div>' +
+      '<div class="col" style="margin-top:18px"><button class="btn" data-act="toast" data-msg="Saved as an image for your story">Share as a story</button>' +
+      '<p class="small muted" style="text-align:center">Shows only this round, which you both played. Never anything from your private pages.</p></div>';
+  }
+
+  /* ------------------------------------------------------------------
+   * Self.
+   * ---------------------------------------------------------------- */
+  function self() {
+    const finds = [
+      ['You tend to want plans settled early.', 'From your own answers · early signal'],
+      ['After friction, you reach out first — usually within a day.', 'From three reflections'],
+      ['Things go better with Maya when you lead with the conclusion.', 'From something you tested · 2 Oct']
+    ];
+    return '<header class="col" style="align-items:center;text-align:center">' + medal(SELF, 200, 'full') +
+        '<h1 class="display-xl">Alex</h1><p class="italic muted">Your own portrait, engraved from your own answers</p></header>' +
+      '<section class="col"><div class="chapter"><span class="num">I</span><h2>Your side</h2></div><p class="small muted">You are half of every interaction you record.</p>' +
+        '<div class="list">' + finds.map(([t, s]) => '<div class="col-s"><p style="font-family:var(--display);font-size:1.35rem;font-weight:600;line-height:1.15">' + t + '</p><span class="label">' + s + '</span></div>').join('') + '</div></section>' +
+      '<section class="col"><div class="chapter"><span class="num">II</span><h2>October, in review</h2></div>' +
+        '<button class="panel tap col-s" data-act="review" style="width:100%"><p class="italic" style="font-family:var(--display);font-size:1.35rem">"You changed your mind once. That is the whole point."</p><span class="link">Read the review</span></button></section>' +
+      '<section class="col"><div class="chapter"><span class="num">III</span><h2>Privacy</h2></div>' +
+        '<div class="list">' + [['Your pages', 'Only you can read them. Encrypted, and never used to train anything — even if you agree to research.'], ['No surveillance', 'No locations, no messages, no screenshots of anyone else. Second-hand stories become questions.'], ['Leaving', 'Delete a portrait, or everything, at any time. It is gone for good.']].map(([h, t]) => '<div class="col-s"><span class="label brass">' + h + '</span><p class="small">' + t + '</p></div>').join('') + '</div>' +
+        '<button class="btn-line" data-act="toast" data-msg="Works in the full app">Export or delete everything</button></section>' +
+      '<section class="col-s"><span class="label">What EVERY1 will not do</span><p class="small muted">No scores or rankings of people. No diagnoses. No tracking. No notes about anyone under eighteen. No advice on how to manipulate anyone.</p></section>';
+  }
+  function reviewSheet() {
+    const stat = (n, l) => '<div class="between" style="padding:10px 0;border-top:1px solid var(--rule)"><span>' + l + '</span><span style="font-family:var(--display);font-size:1.8rem;color:var(--brass);font-variant-numeric:tabular-nums">' + n + '</span></div>';
+    return '<div class="grab"></div><div class="col"><span class="label brass">October · in review</span>' +
+      '<p class="epigraph">You changed your mind once. That is the whole point.</p>' +
+      '<div>' + stat(4, 'Theories you tested instead of keeping') + stat(1, 'Theory you abandoned') + stat(2, 'Questions you asked directly') + stat(14, 'Moments observed') + '</div>' +
+      '<p class="small muted">The area you paid most attention to: <span class="italic">strain</span>. About you only — no names, nothing about anyone else.</p>' +
+      '<button class="btn" data-act="toast" data-msg="Saved as an image for your story">Share my month</button></div>';
+  }
+
+  /* ------------------------------------------------------------------
+   * Observe (the + button).
+   * ---------------------------------------------------------------- */
+  function observeSheet() {
+    const n = S.note, hits = CHECKS.filter(c => c.re.test(n.t)), blocked = hits.some(h => h.stop);
+    return '<div class="grab"></div><div class="col">' +
+      '<div class="between"><span class="label brass">New observation</span><button class="label" data-act="close">Close</button></div>' +
+      '<h2 class="display-l">What did you observe?</h2>' +
+      '<div class="circle" style="gap:12px">' + PEOPLE.map(p => '<button data-act="np" data-v="' + p.id + '" style="opacity:' + (n.pid === p.id ? 1 : 0.4) + ';width:60px">' + medal(p, 56) + '<span class="nm" style="font-size:.95rem">' + esc(p.n) + '</span></button>').join('') + '</div>' +
+      '<div class="moments">' + MOMENTS.map(([l, a], i) => '<button data-act="mom" data-i="' + i + '" aria-pressed="' + (n.m === i) + '">' + l + '<span>' + AREAS.find(x => x.k === a).l + '</span></button>').join('') + '</div>' +
+      '<textarea class="field" id="nt" placeholder="Add the detail — what exactly was said or done. Optional.">' + esc(n.t) + '</textarea>' +
+      '<div id="checks" class="col">' + checksHtml(hits) + '</div>' +
+      '<div class="col-s"><span class="label">Where</span><div class="chips">' + ['Work', 'Home', 'Out', 'Online', 'Family'].map(o => '<button class="chip" data-act="nf" data-v="' + o + '" aria-pressed="' + (n.where === o) + '">' + o + '</button>').join('') + '</div></div>' +
+      '<input class="field italic" id="nr" placeholder="My read — your interpretation, kept apart (optional)" value="' + esc(n.r) + '">' +
+      '<div class="col-s"><span class="label">Try writing one of these, to see how EVERY1 responds</span><div class="chips">' + ['she was so rude today', 'Jo said he never listens', 'I think she\'s depressed', 'where he went last night'].map(e => '<button class="chip" data-act="ex" data-v="' + esc(e) + '">' + esc(e) + '</button>').join('') + '</div></div>' +
+      '<button class="btn" id="nsave" data-act="nsave"' + (blocked || (!n.t.trim() && n.m == null) ? ' disabled' : '') + '>Record</button>' +
+      '<p class="label" style="text-align:center">Private · encrypted · never used for training</p></div>';
+  }
+  function checksHtml(hits) {
+    return hits.map(h => '<div class="margin' + (h.stop ? ' stop' : '') + '"><span class="label" style="color:' + (h.stop ? 'var(--blood)' : 'var(--brass)') + '">' + (h.stop ? 'Not kept' : h.q ? 'Second-hand' : 'Verdict') + '</span>' + h.msg +
+      (h.q ? '<div style="margin-top:8px"><button class="link" data-act="toq">Make it a question</button></div>' : '') +
+      (h.read ? '<div style="margin-top:8px"><button class="link" data-act="toread">Move "' + esc((S.note.t.match(h.re) || [''])[0]) + '" to my read</button></div>' : '') + '</div>').join('');
+  }
+
+  function areaSheet(k) {
+    const p = P(S.pid), a = AREAS.find(x => x.k === k), es = p.entries.filter(e => e.d === k);
+    return '<div class="grab"></div><div class="col"><span class="label brass">' + esc(p.n) + ' · ' + a.l + '</span><h2 class="display-l">' + a.full + '</h2>' +
+      (es.length ? '<div class="list">' + es.map(e => '<div class="col-s"><span class="kind label brass">' + KIND[e.k] + ' · ' + esc(e.w) + '</span><p>' + esc(e.t) + '</p></div>').join('') + '</div>'
+        : '<p class="muted italic">Nothing observed here yet. Empty stays empty until you see something.</p>') +
+      '<button class="btn" data-act="observe" data-pid="' + p.id + '">Record an observation</button></div>';
+  }
+
+  function addSheet() {
+    const a = S.add || (S.add = { n: '', rel: null, adult: null }), ok = a.n.trim() && a.rel && a.adult === 'yes';
+    return '<div class="grab"></div><div class="col"><span class="label brass">New portrait</span><h2 class="display-l">Who is it?</h2>' +
+      '<input class="field" id="an" maxlength="24" placeholder="First name or nickname" value="' + esc(a.n) + '">' +
+      '<div class="col-s"><span class="label">They are your</span><div class="chips">' + ['Friend', 'Partner', 'Family', 'Colleague', 'Manager', 'Ex / co-parent'].map(c => '<button class="chip" data-act="arel" data-v="' + c + '" aria-pressed="' + (a.rel === c) + '">' + c + '</button>').join('') + '</div></div>' +
+      (a.rel === 'Ex / co-parent' ? '<p class="small muted italic">Suggestions to contact them are off by default. You can turn them on if contact is welcome.</p>' : '') +
+      '<div class="col-s"><span class="label">Are they eighteen or older?</span><div class="chips"><button class="chip" data-act="aad" data-v="yes" aria-pressed="' + (a.adult === 'yes') + '">Yes</button><button class="chip" data-act="aad" data-v="no" aria-pressed="' + (a.adult === 'no') + '">No</button></div></div>' +
+      (a.adult === 'no' ? '<div class="margin stop"><span class="label" style="color:var(--blood)">Not available</span>EVERY1 is only for understanding adults.</div>' : '') +
+      '<button class="btn" data-act="acreate"' + (ok ? '' : ' disabled') + '>Begin the portrait</button></div>';
+  }
+
+  /* ------------------------------------------------------------------
+   * Render.
+   * ---------------------------------------------------------------- */
+  const VIEWS = { index, portraits, person, mirror, self };
+  const TITLES = { index: 'Index', portraits: 'Portraits', mirror: 'The Mirror', self: 'Self' };
+  function render() {
+    $('view').innerHTML = VIEWS[S.view]();
+    document.querySelectorAll('#nav [data-nav]').forEach(b => {
+      const on = b.dataset.nav === S.view || (S.view === 'person' && b.dataset.nav === 'portraits');
+      if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+    });
+    $('nav').hidden = !S.obDone; $('topbar').hidden = !S.obDone;
+    renderLayer();
+    if (S.view === 'mirror' && S.game.i < GAME.length) bindSwipe();
+  }
+  function renderLayer() {
+    let html = '';
+    if (!S.obDone) html = onboarding();
+    else if (S.sheet) {
+      const k = S.sheet.k;
+      const body = k === 'area' ? areaSheet(S.sheet.a) : { observe: observeSheet, add: addSheet, review: reviewSheet, certificate: certificateSheet }[k]();
+      html = '<div class="sheet-back" data-act="close"></div><div class="sheet" role="dialog" aria-modal="true">' + body + '</div>';
+    }
+    $('layer').innerHTML = html;
+    $('hback').disabled = HI === 0 && !S.sheet;
+    $('hfwd').disabled = HI >= HIST.length - 1;
+    $('httl').textContent = S.view === 'person' ? P(S.pid).n : TITLES[S.view];
+    paintAll();
+  }
+  function sheet(k, extra) { S.sheet = Object.assign({ k }, extra || {}); renderLayer(); }
+  function toast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; $('phone').appendChild(t); setTimeout(() => t.remove(), 2200); }
+  function copy(text, ok) { try { navigator.clipboard.writeText(text).then(() => toast(ok), () => toast(ok)); } catch (e) { toast(ok); } }
+
+  function bindSwipe() {
+    const el = $('qcard'); if (!el) return;
+    let x0 = null, dx = 0;
+    el.addEventListener('pointerdown', e => { if (e.target.closest('button')) return; x0 = e.clientX; el.setPointerCapture(e.pointerId); el.style.transition = 'none'; });
+    el.addEventListener('pointermove', e => { if (x0 === null) return; dx = e.clientX - x0; el.style.transform = 'translateX(' + dx + 'px) rotate(' + dx / 22 + 'deg)'; });
+    const end = () => { if (x0 === null) return; el.style.transition = ''; if (Math.abs(dx) > 90) pick(dx < 0 ? 'a' : 'b'); else el.style.transform = ''; x0 = null; dx = 0; };
+    el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+  }
+  function pick(v) {
+    const el = $('qcard'); S.game.picks[S.game.i] = v;
+    if (el) { el.style.transform = 'translateX(' + (v === 'a' ? -1 : 1) * 480 + 'px) rotate(' + (v === 'a' ? -14 : 14) + 'deg)'; el.style.opacity = '0'; }
+    setTimeout(() => { S.game.i++; render(); }, 240);
+  }
+
+  document.addEventListener('input', e => {
+    if (e.target.id === 'nt') {
+      S.note.t = e.target.value;
+      const hits = CHECKS.filter(c => c.re.test(S.note.t));
+      $('checks').innerHTML = checksHtml(hits);
+      $('nsave').disabled = hits.some(h => h.stop) || (!S.note.t.trim() && S.note.m == null);
+    }
+    if (e.target.id === 'nr') S.note.r = e.target.value;
+    if (e.target.id === 'an') { S.add.n = e.target.value; const b = document.querySelector('[data-act="acreate"]'); if (b) b.disabled = !(S.add.n.trim() && S.add.rel && S.add.adult === 'yes'); }
+  });
+
+  document.addEventListener('click', e => {
+    const el = e.target.closest('[data-nav],[data-act]'); if (!el) return;
+    const d = el.dataset;
+    if (d.nav) { go({ view: d.nav }); return; }
+    switch (d.act) {
+      case 'hback': back(); break;
+      case 'hfwd': fwd(); break;
+      case 'ob-next': if (S.ob < OB.length - 1) { S.ob++; renderLayer(); } else { S.obDone = true; render(); } break;
+      case 'ob-skip': S.obDone = true; render(); break;
+      case 'open': go({ view: 'person', pid: d.pid, tab: d.tab || 'observed' }); break;
+      case 'tab': go({ view: 'person', pid: S.pid, tab: d.tab }); break;
+      case 'another': S.prompt++; render(); break;
+      case 'deepen': deepen($('bigpc')); break;
+      case 'area': sheet('area', { a: d.a }); break;
+      case 'add': S.add = null; sheet('add'); break;
+      case 'review': sheet('review'); break;
+      case 'certificate': sheet('certificate'); break;
+      case 'close': S.sheet = null; renderLayer(); break;
+      case 'toast': toast(d.msg); break;
+      case 'copy': copy(P(S.pid).questions[+d.i].ask, 'Copied. Now ask in your own words.'); break;
+      case 'asked': toast('Record what they said, under "They told me".'); break;
+      case 'abandon': toast('Abandoned theories are kept, with your reason. Changing your mind is the point.'); break;
+      case 'pick': pick(d.v); break;
+      case 'replay': S.game = { i: 0, picks: [] }; render(); break;
+      case 'observe': S.note = { pid: d.pid || (S.view === 'person' ? S.pid : 'maya'), t: '', r: '', where: null, m: null }; sheet('observe'); break;
+      case 'np': S.note.pid = d.v; renderLayer(); break;
+      case 'mom': S.note.m = S.note.m === +d.i ? null : +d.i; renderLayer(); break;
+      case 'nf': S.note.where = S.note.where === d.v ? null : d.v; renderLayer(); break;
+      case 'ex': S.note.t = d.v; S.note.m = null; renderLayer(); break;
+      case 'toread': {
+        const c = CHECKS.find(x => x.k === 'trait'), m = S.note.t.match(c.re);
+        if (m) { S.note.r = (S.note.r ? S.note.r + '; ' : '') + 'seemed ' + m[0]; S.note.t = S.note.t.replace(c.re, '…').replace(/\s+/g, ' ').trim(); }
+        renderLayer(); break;
+      }
+      case 'toq': { const p = P(S.note.pid); p.questions.push({ q: 'Is this true: "' + S.note.t + '"?', ask: 'I would rather hear it from you than from someone else. Can I ask you something?' }); S.sheet = null; renderLayer(); toast('Kept as a question for ' + p.n + ', not as a fact.'); break; }
+      case 'nsave': {
+        const n = S.note, p = P(n.pid), m = n.m != null ? MOMENTS[n.m] : null;
+        p.entries.unshift({ d: m ? m[1] : 'comm', k: m && m[2] ? m[2] : 'saw', t: n.t.trim() ? n.t.trim() : m[0] + '.', w: 'Today', r: n.r || undefined });
+        S.sheet = null; go({ view: 'person', pid: p.id, tab: 'observed' }); toast('Recorded in ' + p.n + '\'s portrait.'); break;
+      }
+      case 'arel': S.add.rel = d.v; renderLayer(); break;
+      case 'aad': S.add.adult = d.v; renderLayer(); break;
+      case 'acreate': {
+        const nm = S.add.n.trim().split(/\s+/)[0], id = 'p' + Date.now();
+        PEOPLE.push({ id, n: nm, rel: S.add.rel, entries: [], theories: [], questions: [{ q: 'What actually helps ' + nm + ' on a hard day?', ask: 'Random question: on a really bad day, what helps you more — company, or space?' }] });
+        S.sheet = null; go({ view: 'person', pid: id, tab: 'observed' }); toast(nm + '\'s portrait begins as faint lines.'); break;
+      }
+    }
+  });
+  document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"][data-nav]')) { e.preventDefault(); go({ view: e.target.dataset.nav }); } });
+
+  render();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { CACHE.clear(); paintAll(); });
+})();
+</script>

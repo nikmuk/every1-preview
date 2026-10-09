@@ -1,0 +1,617 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EVERY1 Glass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500&family=Instrument+Serif:ital@0;1&display=swap">
+<style>
+/* Layout: one phone-sized column of liquid-glass layers floating over a slow
+   colour field. Content first; glass only where it lifts something up.
+   Light by default, with a matching dark field. */
+:root {
+  --bg: #f3f1f8;
+  --m1: #ffd2c2;   /* peach */
+  --m2: #cbd7ff;   /* periwinkle */
+  --m3: #c9f2df;   /* mint */
+  --glass: rgba(255, 255, 255, 0.58);
+  --glass-hi: rgba(255, 255, 255, 0.82);
+  --edge: rgba(255, 255, 255, 0.85);
+  --hair: rgba(21, 19, 28, 0.08);
+  --text: #15131c;
+  --sub: #555166;
+  --faint: #8b8799;
+  --accent: #4b33e8;
+  --accent-ink: #ffffff;
+  --accent-soft: rgba(75, 51, 232, 0.1);
+  --good: #12805a;
+  --stop: #c4372f;
+  --stop-soft: rgba(196, 55, 47, 0.1);
+  --shadow: 0 10px 30px rgba(40, 30, 90, 0.10), 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+  --ui: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --mono: 'Geist Mono', ui-monospace, Menlo, monospace;
+  --r-lg: 28px;
+  --r-md: 20px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e0d14; --m1: #4a2235; --m2: #1c2a5c; --m3: #10392e;
+    --glass: rgba(34, 32, 48, 0.55); --glass-hi: rgba(44, 42, 60, 0.82); --edge: rgba(255, 255, 255, 0.14);
+    --hair: rgba(255, 255, 255, 0.08); --text: #f4f2fb; --sub: #b6b1c7; --faint: #807b92;
+    --accent: #9a8bff; --accent-ink: #0e0d14; --accent-soft: rgba(154, 139, 255, 0.16);
+    --good: #4fd1a1; --stop: #ff7a70; --stop-soft: rgba(255, 122, 112, 0.14);
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e0d14; --m1: #4a2235; --m2: #1c2a5c; --m3: #10392e;
+  --glass: rgba(34, 32, 48, 0.55); --glass-hi: rgba(44, 42, 60, 0.82); --edge: rgba(255, 255, 255, 0.14);
+  --hair: rgba(255, 255, 255, 0.08); --text: #f4f2fb; --sub: #b6b1c7; --faint: #807b92;
+  --accent: #9a8bff; --accent-ink: #0e0d14; --accent-soft: rgba(154, 139, 255, 0.16);
+  --good: #4fd1a1; --stop: #ff7a70; --stop-soft: rgba(255, 122, 112, 0.14);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--ui); font-size: 16px; line-height: 1.42; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+input, textarea { font: inherit; color: var(--text); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 12px; }
+h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: -0.035em; line-height: 1.02; text-wrap: balance; }
+p { margin: 0; }
+em.s { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+
+/* Frame */
+.stage { min-height: 100%; display: grid; place-items: start center; background: var(--bg); }
+@media (min-width: 520px) { .stage { padding-block: 26px; } }
+.phone { position: relative; width: 100%; max-width: 420px; height: 100vh; height: 100dvh; overflow: hidden; overflow: clip; isolation: isolate; background: var(--bg); }
+@media (min-width: 520px) { .phone { height: 860px; border-radius: 46px; box-shadow: 0 30px 90px rgba(30, 20, 70, 0.25), 0 0 0 10px #0d0c12; } }
+
+/* The colour field: three soft blobs drifting slowly behind the glass */
+.field { position: absolute; inset: -20%; z-index: -1; filter: blur(50px) saturate(1.15); }
+.field i { position: absolute; border-radius: 50%; opacity: 0.95; animation: drift 22s ease-in-out infinite alternate; }
+.field i:nth-child(1) { width: 60%; height: 45%; left: -5%; top: 2%; background: var(--m1); }
+.field i:nth-child(2) { width: 65%; height: 50%; right: -10%; top: 25%; background: var(--m2); animation-duration: 28s; }
+.field i:nth-child(3) { width: 55%; height: 45%; left: 10%; bottom: 0; background: var(--m3); animation-duration: 34s; }
+@keyframes drift { to { transform: translate(8%, 6%) scale(1.08); } }
+
+.scroll { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; padding-inline: 18px; padding-block: calc(70px + env(safe-area-inset-top, 0px)) 130px; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+#view { display: flex; flex-direction: column; gap: 16px; }
+
+/* Glass */
+.glass { background: var(--glass); backdrop-filter: blur(22px) saturate(1.6); -webkit-backdrop-filter: blur(22px) saturate(1.6); border: 1px solid var(--edge); box-shadow: var(--shadow); }
+.card { border-radius: var(--r-lg); padding: 18px; }
+.tap { transition: transform .18s cubic-bezier(.2,.9,.3,1.3), background .2s; }
+.tap:active { transform: scale(0.97); }
+
+/* Top bar */
+.topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 42; background: linear-gradient(var(--bg) 0%, rgba(0,0,0,0) 100%); display: grid; grid-template-columns: 44px 1fr 44px; gap: 8px; align-items: center; padding: calc(12px + env(safe-area-inset-top, 0px)) 14px 8px; }
+.topbar button { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; font-size: 1.15rem; font-weight: 700; text-align: center; }
+.topbar button:disabled { opacity: 0.35; cursor: default; }
+.topbar .ttl { justify-self: center; padding: 8px 14px; border-radius: 999px; font-weight: 600; font-size: 0.86rem; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+
+/* Tab bar: a floating glass capsule */
+.nav { position: absolute; left: 14px; right: 14px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 20; display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; border-radius: 32px; padding: 7px; }
+.nav button { display: grid; justify-items: center; gap: 2px; padding: 7px 0; border-radius: 24px; font-size: 0.68rem; font-weight: 600; color: var(--sub); transition: background .25s, color .25s; }
+.nav button svg { width: 22px; height: 22px; }
+.nav button[aria-current="page"] { background: var(--accent-soft); color: var(--accent); }
+.nav .plus { width: 54px; height: 54px; margin: -4px auto; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: 1.9rem; font-weight: 500; display: grid; place-items: center; padding: 0; box-shadow: 0 10px 24px rgba(75, 51, 232, 0.35); }
+
+/* Type */
+.eyebrow { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
+.sub { color: var(--sub); }
+.faint { color: var(--faint); font-size: 0.85rem; }
+.h-xl { font-size: 2.6rem; }
+.h-l { font-size: 1.9rem; }
+.h-m { font-size: 1.35rem; letter-spacing: -0.025em; }
+.col { display: flex; flex-direction: column; gap: 10px; }
+.col-s { display: flex; flex-direction: column; gap: 4px; }
+.row { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.between { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.grow { flex: 1; min-width: 0; }
+.wrap { flex-wrap: wrap; }
+
+/* Controls — Material-expressive shapes */
+.btn { display: block; width: 100%; text-align: center; padding: 16px 20px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 1rem; transition: transform .15s; }
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.35; }
+.btn-soft { display: block; width: 100%; text-align: center; padding: 14px 18px; border-radius: 999px; background: var(--glass-hi); border: 1px solid var(--edge); font-weight: 650; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 999px; font-size: 0.82rem; font-weight: 600; background: var(--glass-hi); border: 1px solid var(--edge); }
+.pill.on { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.pill.accent { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* People */
+canvas.drop { display: block; }
+.orbit { display: flex; gap: 14px; overflow-x: auto; margin-inline: -18px; padding-inline: 18px; padding-bottom: 4px; scrollbar-width: none; }
+.orbit::-webkit-scrollbar { display: none; }
+.orbit button { display: grid; justify-items: center; gap: 4px; flex: none; font-size: 0.8rem; font-weight: 600; }
+.addcircle { width: 68px; height: 68px; border-radius: 50%; display: grid; place-items: center; font-size: 1.6rem; color: var(--sub); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* Ask bar (AI-native input) */
+.ask { border-radius: 30px; padding: 6px 6px 6px 18px; display: flex; align-items: center; gap: 8px; }
+.ask input { flex: 1; min-width: 0; border: 0; background: transparent; font-size: 1.02rem; padding: 12px 0; outline: none; }
+.ask input::placeholder { color: var(--faint); }
+.ask .mic { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); flex: none; }
+.parsed { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.parsed .tok { padding: 6px 11px; border-radius: 12px; font-size: 0.82rem; font-weight: 600; background: var(--glass-hi); border: 1px solid var(--edge); animation: pop .3s cubic-bezier(.2,.9,.3,1.4) both; }
+.parsed .tok b { font-family: var(--mono); font-size: 0.62rem; font-weight: 500; color: var(--faint); text-transform: uppercase; letter-spacing: 0.06em; margin-right: 5px; }
+@keyframes pop { from { transform: scale(0.7); opacity: 0; } }
+
+.note { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; }
+.note .k { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 8px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; margin-top: 2px; }
+.note .k.read { background: transparent; border: 1px dashed var(--faint); color: var(--sub); }
+.list > * + * { border-top: 1px solid var(--hair); }
+.list > * { padding-block: 13px; }
+
+.guard { border-radius: var(--r-md); padding: 12px 14px; font-size: 0.9rem; background: var(--accent-soft); }
+.guard.stop { background: var(--stop-soft); color: var(--stop); }
+.guard b { display: block; margin-bottom: 2px; }
+
+.seg { display: flex; padding: 4px; border-radius: 999px; gap: 4px; }
+.seg button { flex: 1; text-align: center; padding: 9px 4px; border-radius: 999px; font-weight: 650; font-size: 0.86rem; color: var(--sub); transition: background .25s, color .25s; }
+.seg button[aria-current="true"] { background: var(--text); color: var(--bg); }
+
+/* Kind card ("Tell them") */
+.kind { border-radius: 30px; padding: 26px 22px; color: #1b1426; background: linear-gradient(150deg, #ffd9c9 0%, #ffc0d9 40%, #c9c3ff 75%, #bff0de 115%); display: flex; flex-direction: column; gap: 16px; box-shadow: 0 24px 50px rgba(90, 60, 160, 0.22); }
+.kind p.big { font-family: var(--serif); font-size: 1.95rem; line-height: 1.08; }
+
+/* Mirror */
+.qcard { border-radius: 32px; padding: 24px 20px; min-height: 360px; display: flex; flex-direction: column; justify-content: space-between; gap: 18px; touch-action: pan-y; user-select: none; transition: transform .3s cubic-bezier(.2,.8,.2,1), opacity .25s; }
+.qcard h2 { font-family: var(--serif); font-weight: 400; font-size: 2.3rem; letter-spacing: -0.01em; }
+.opt { width: 100%; padding: 16px; border-radius: 20px; font-weight: 650; display: flex; justify-content: space-between; align-items: center; }
+.dots { display: flex; gap: 5px; }
+.dots i { flex: 1; height: 4px; border-radius: 4px; background: var(--hair); }
+.dots i.on { background: var(--accent); }
+
+/* Sheets */
+.sheet-back { position: absolute; inset: 0; z-index: 40; background: rgba(15, 12, 30, 0.28); animation: fade .2s; }
+.sheet { position: absolute; left: 8px; right: 8px; bottom: 8px; max-height: 86%; overflow-y: auto; z-index: 41; border-radius: 34px; padding: 10px 18px calc(24px + env(safe-area-inset-bottom, 0px)); background: var(--glass-hi); backdrop-filter: blur(30px) saturate(1.7); -webkit-backdrop-filter: blur(30px) saturate(1.7); border: 1px solid var(--edge); animation: up .38s cubic-bezier(.2,.9,.25,1.05); scrollbar-width: none; }
+.sheet::-webkit-scrollbar { display: none; }
+.grab { width: 38px; height: 5px; border-radius: 9px; background: var(--hair); margin: 4px auto 14px; }
+@keyframes up { from { transform: translateY(105%); } }
+@keyframes fade { from { opacity: 0; } }
+.field-in { width: 100%; padding: 14px 16px; border-radius: 20px; background: var(--glass-hi); border: 1px solid var(--edge); font-size: 1rem; }
+textarea.field-in { min-height: 96px; resize: none; }
+.field-in::placeholder { color: var(--faint); }
+
+/* Stories (weekly recap) */
+.story { position: absolute; inset: 0; z-index: 55; display: flex; flex-direction: column; padding: calc(16px + env(safe-area-inset-top, 0px)) 20px calc(30px + env(safe-area-inset-bottom, 0px)); color: #fff; }
+.story .bars { display: flex; gap: 4px; }
+.story .bars i { flex: 1; height: 3px; border-radius: 3px; background: rgba(255, 255, 255, 0.35); overflow: hidden; }
+.story .bars i b { display: block; height: 100%; width: 0; background: #fff; }
+.story .bars i.done b { width: 100%; }
+.story .bars i.now b { animation: bar 4.5s linear forwards; }
+@keyframes bar { to { width: 100%; } }
+.story .body { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+.story .big { font-size: 5rem; font-weight: 800; letter-spacing: -0.05em; line-height: 0.9; }
+.story .ser { font-family: var(--serif); font-size: 2.4rem; line-height: 1.04; }
+.story .zones { position: absolute; inset: 70px 0 120px; display: grid; grid-template-columns: 1fr 2fr; }
+
+/* Widget preview */
+.widget { width: 158px; height: 158px; border-radius: 26px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; color: #fff; background: linear-gradient(160deg, #5b44f0, #8f5cf0 60%, #ff8fb1); box-shadow: 0 14px 30px rgba(75, 51, 232, 0.3); flex: none; }
+
+.toast { position: absolute; left: 50%; bottom: 108px; transform: translateX(-50%); z-index: 70; padding: 12px 18px; border-radius: 999px; font-weight: 650; font-size: 0.9rem; width: max-content; max-width: calc(100% - 40px); animation: pop .3s cubic-bezier(.2,.9,.3,1.4); background: var(--text); color: var(--bg); }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="stage">
+  <div class="phone" id="phone">
+    <div class="field" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="topbar" id="topbar">
+      <button class="glass" id="hback" data-act="hback" aria-label="Back">‹</button>
+      <span class="ttl glass" id="httl"></span>
+      <button class="glass" id="hfwd" data-act="hfwd" aria-label="Forward">›</button>
+    </div>
+    <div class="scroll" id="scroll"><div id="view"></div></div>
+    <nav class="nav glass" id="nav" aria-label="Main">
+      <button data-nav="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Today</button>
+      <button data-nav="people"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="9" r="4"/><circle cx="17" cy="15" r="3"/><path d="M2 21c0-3 3-5 7-5"/></svg>People</button>
+      <button class="plus" data-act="tell" aria-label="Tell someone something kind">♡</button>
+      <button data-nav="mirror"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="3" width="10" height="15" rx="3" transform="rotate(-8 9 10)"/><rect x="10" y="6" width="10" height="15" rx="3" transform="rotate(8 15 13)"/></svg>Mirror</button>
+      <button data-nav="you"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>You</button>
+    </nav>
+    <div id="layer"></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  /* ------------------------------------------------------------------
+   * Sample data — fictional.
+   * ---------------------------------------------------------------- */
+  const AREAS = { comm: 'Talk', conflict: 'Clashes', support: 'Hard days', plans: 'Plans', feedback: 'Feedback', social: 'Energy', space: 'Boundaries' };
+  const KIND = { saw: 'Saw', said: 'They said', tried: 'Tried', read: 'My read' };
+  const PEOPLE = [
+    { id: 'sam', n: 'Sam', rel: 'Best friend', joined: true, notes: [
+      { d: 'support', k: 'said', t: 'Needs an evening alone before talking about anything hard.', w: 'Fri' },
+      { d: 'support', k: 'tried', t: 'Gave him space after the interview, called next morning. "Exactly right."', w: 'Last wk' },
+      { d: 'conflict', k: 'saw', t: 'Sent a meme two days after our argument. Didn\'t mention it.', w: 'Sep 19' },
+      { d: 'plans', k: 'tried', t: 'Asked if he wanted Saturday planned. "Leave it open." Went great.', w: 'Sep 12' },
+      { d: 'social', k: 'saw', t: 'An hour of talk at coffee, almost silent at the party.', w: 'Sep 6' }],
+      patterns: [{ t: 'On a hard day, he wants an evening alone first, then company.', s: 'Checked twice', alt: 'He was still working out what he needed' },
+                 { t: 'After an argument, he repairs with something light.', s: 'Seen 2 times', alt: 'He assumes I want to move on' }],
+      asks: [{ q: 'Raise arguments again later, or let them go?', w: 'After we clash, what helps you get back to normal? I want to get better at that.' }] },
+    { id: 'maya', n: 'Maya', rel: 'Coworker', notes: [
+      { d: 'comm', k: 'saw', t: 'Asked "what\'s the headline?" twice during my update.', w: 'Today' },
+      { d: 'comm', k: 'tried', t: 'Led with the conclusion in the review. She engaged straight away.', w: 'Fri' },
+      { d: 'feedback', k: 'saw', t: 'Went quiet after the director questioned her numbers.', w: 'Sep 25' }],
+      patterns: [{ t: 'In work updates, she wants the conclusion first.', s: 'Seen 2 times', alt: 'She was short on time that week' }],
+      asks: [{ q: 'How does she like to hear about changes?', w: 'When plans change, should I tell you straight away, or once it\'s settled?' }] },
+    { id: 'mum', n: 'Mum', rel: 'Family', notes: [
+      { d: 'support', k: 'saw', t: 'Drove two hours with soup when I was ill. Said very little.', w: 'Aug' },
+      { d: 'space', k: 'saw', t: 'Changed the subject twice when I mentioned moving.', w: 'Oct 5' }],
+      patterns: [{ t: 'She shows care by doing, not saying.', s: 'One time so far', alt: 'Saying it out loud is hard for her' }], asks: [] },
+    { id: 'dev', n: 'Dev', rel: 'Brother', notes: [{ d: 'social', k: 'saw', t: 'Reached out first after three quiet weeks.', w: 'Oct 1' }], patterns: [], asks: [] },
+    { id: 'priya', n: 'Priya', rel: 'New friend', notes: [], patterns: [], asks: [] }
+  ];
+  const P = id => PEOPLE.find(p => p.id === id);
+  const checks = p => p.notes.filter(n => n.k === 'said' || n.k === 'tried').length;
+  const clarity = p => { const c = checks(p); return c >= 4 ? 3 : c >= 2 ? 2 : 1; };
+  const CLARITY = ['', 'Hazy', 'Clearer', 'Clear'];
+  const counts = p => { const c = {}; p.notes.forEach(n => { c[n.d] = (c[n.d] || 0) + 1; }); return c; };
+  const ME = { id: 'me-alex', n: 'Alex', notes: ['support', 'plans', 'feedback', 'conflict', 'social', 'comm'].map(d => ({ d, k: 'said' })) };
+
+  /* Lens: one question about yourself, arriving at a different time each day.
+     Friends' answers are the ones they chose to share with you — no counts,
+     no "in sync", no ranking. */
+  const LENS = { q: 'Bad day. What do you actually want?', a: 'Company', b: 'Space', shared: [{ id: 'sam', v: 'Space' }, { id: 'dev', v: 'Company' }] };
+
+  const GAME = [
+    { q: 'After a hard day, Sam wants…', a: 'Company, right away', b: 'Space first', sam: 'b', area: 'hard days' },
+    { q: 'You cancel last minute. Sam…', a: 'Lets it go', b: 'Is quietly hurt', sam: 'a', area: 'plans' },
+    { q: 'A free Saturday should be…', a: 'Planned', b: 'Wide open', sam: 'b', area: 'plans' },
+    { q: 'Hard feedback. Sam wants it…', a: 'Softened', b: 'Straight', sam: 'b', area: 'feedback' },
+    { q: 'After a fight, Sam…', a: 'Reaches out first', b: 'Waits', sam: 'a', area: 'clashes' }
+  ];
+
+  const KIND_STARTERS = ['You always reach out first after we argue. It means a lot.', 'You make plans feel easy.', 'You listen without trying to fix it. I notice.', 'You tell me the truth, kindly.'];
+
+  /* Screening (same rules as the real app). */
+  const CHECKS = [
+    { stop: true, re: /\b(track|follow(ed)? (her|him|them)|check(ed)? (her|his|their) phone|where (she|he|they) (goes|went|was)|who (she|he|they)('?s| is| are| was)? (texting|seeing|messaging))\b/i, h: 'Not kept', m: 'EVERY1 never records where someone goes, who they talk to, or what\'s on their phone.' },
+    { stop: true, re: /(\b(i think|probably|maybe|must be|seems?( to be)?|definitely|clearly)\b.{0,30}\b(depress\w*|adhd|autis\w*|bipolar|ocd|narcissis\w*|psychopath\w*|sociopath\w*)\b)|(\b(she|he|they)('s| is| are)( a| an)? (depressed|adhd|autistic|bipolar|ocd|narcissist\w*|psychopath\w*|sociopath\w*)\b)/i, h: 'Not kept', m: 'Guesses about someone\'s health or mental state are never saved. What did they actually do or say?' },
+    { re: /(\b(?!(?:He|She|They|We|I)\b)[A-Z][a-z]+ (said|says|told me) (that )?(he|she|they)\b)|(\b(someone|people|everyone) (said|says|told me)\b)|(\b[Ii] heard (that )?(he|she|they)\b)|(\b[Aa]pparently,? (he|she|they)\b)/, h: 'Second-hand', m: 'It\'ll be saved as a question to find out, not as something you saw.' },
+    { re: /\b(rude|lazy|selfish|needy|manipulative|controlling|toxic|passive[- ]aggressive|clingy|arrogant)\b/i, h: 'That\'s a label', m: 'Labels go in "my read". What did they actually do?' }
+  ];
+  const UNKIND = /\b(but|always late|never|annoying|hate|rude|lazy|selfish|needy|toxic|ugly|stupid|weird|cringe|fat)\b/i;
+
+  /* "Just say it" — turns a sentence into a structured note. In the full app
+     this is a small on-device model; here, a handful of rules. */
+  const MOMENT_RULES = [
+    [/\b(quiet|silent|withdrew|ignored)\b/i, 'Went quiet', 'conflict'], [/\bcancel/i, 'Cancelled', 'plans'],
+    [/\b(plan|booked|suggested)\b/i, 'Made a plan', 'plans'], [/\b(opened up|confided|told me)\b/i, 'Opened up', 'support', 'said'],
+    [/\b(space|alone)\b/i, 'Wanted space', 'support'], [/\b(helped|fixed|brought|cooked)\b/i, 'Helped me', 'support'],
+    [/\b(argued|fight|fought|disagree|clash)/i, 'We clashed', 'conflict'], [/\b(reached out|texted first|called me|messaged first)\b/i, 'Reached out', 'social'],
+    [/\b(feedback|critici)/i, 'Feedback', 'feedback'], [/\b(said no|declined|refused)\b/i, 'Said no', 'space'],
+    [/\b(one word|short reply|replied "?k"?|dry text)\b/i, 'Short reply', 'comm']
+  ];
+  function parse(t) {
+    const out = {};
+    const who = PEOPLE.find(p => new RegExp('\\b' + p.n + '\\b', 'i').test(t)); if (who) out.who = who;
+    for (const [re, m, d, k] of MOMENT_RULES) if (re.test(t)) { out.moment = m; out.area = d; out.kind = k || 'saw'; break; }
+    if (/\byesterday\b/i.test(t)) out.when = 'Yesterday'; else if (/\blast week\b/i.test(t)) out.when = 'Last week'; else if (t.trim()) out.when = 'Today';
+    if (/\b(work|office|meeting|standup)\b/i.test(t)) out.where = 'Work'; else if (/\b(home|house)\b/i.test(t)) out.where = 'Home';
+    else if (/\b(party|dinner|bar|brunch|coffee)\b/i.test(t)) out.where = 'Out'; else if (/\b(text|chat|slack|whatsapp|online)\b/i.test(t)) out.where = 'Online';
+    return out;
+  }
+
+  /* ------------------------------------------------------------------
+   * Living glass portraits.
+   * Each person is a drop of liquid glass. It gets more lobes as you notice
+   * things in more areas, and comes into focus — hazy, clearer, clear — as
+   * you check things with them. Colours come from a random seed, so they say
+   * nothing about the person, and nothing here resembles a face.
+   * ---------------------------------------------------------------- */
+  const HUES = ['#ff8a6b', '#ffb36b', '#7b6bff', '#4cc9f0', '#36d399', '#ff6bb5', '#ffd166', '#5b8cff'];
+  function hashStr(s) { let h = 2166136261 >>> 0; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; } return h; }
+  function mulberry(a) { return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  function dropSpec(p) {
+    const r = mulberry(hashStr(p.id)), i = Math.floor(r() * HUES.length);
+    const areas = Object.keys(counts(p)).length;
+    return { c1: HUES[i], c2: HUES[(i + 2 + Math.floor(r() * 3)) % HUES.length], c3: HUES[(i + 5) % HUES.length], ph: r() * 6.28, sp: 0.4 + r() * 0.3, lobes: 2 + areas, amp: 0.05 + Math.min(areas, 6) * 0.008, clar: clarity(p) };
+  }
+  function drawDrop(ctx, S, sp, t) {
+    const cx = S / 2, cy = S / 2, R = S * 0.38;
+    const rad = th => R * (1 + sp.amp * Math.sin(sp.lobes * th + sp.ph + t * sp.sp) + 0.025 * Math.sin(3 * th - t * 0.7));
+    ctx.beginPath();
+    for (let k = 0; k <= 96; k++) { const th = (k / 96) * Math.PI * 2, rr = rad(th); const x = cx + Math.cos(th) * rr, y = cy + Math.sin(th) * rr; k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+    ctx.closePath();
+    const g = ctx.createRadialGradient(cx - R * 0.3 + Math.sin(t * 0.5) * R * 0.1, cy - R * 0.25, R * 0.05, cx, cy, R * 1.15);
+    g.addColorStop(0, sp.c1); g.addColorStop(0.55, sp.c2); g.addColorStop(1, sp.c3);
+    ctx.fillStyle = g; ctx.fill();
+    ctx.save(); ctx.clip();
+    const sh = ctx.createRadialGradient(cx, cy + R * 0.9, R * 0.1, cx, cy + R * 0.6, R * 1.1);   // inner depth
+    sh.addColorStop(0, 'rgba(20,10,60,0.35)'); sh.addColorStop(1, 'rgba(20,10,60,0)'); ctx.fillStyle = sh; ctx.fillRect(0, 0, S, S);
+    const hi = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.5, 0, cx - R * 0.35, cy - R * 0.5, R * 0.55);  // specular
+    hi.addColorStop(0, 'rgba(255,255,255,0.85)'); hi.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = hi; ctx.fillRect(0, 0, S, S);
+    ctx.restore();
+    ctx.lineWidth = Math.max(1, S * 0.012); ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.stroke();
+  }
+  const OFF = document.createElement('canvas');
+  function paint(cv, t) {
+    const p = cv.dataset.pid === ME.id ? ME : P(cv.dataset.pid); if (!p) return;
+    const size = +cv.dataset.size, dpr = Math.min(2, window.devicePixelRatio || 1), S = Math.round(size * dpr);
+    if (cv.width !== S) { cv.width = S; cv.height = S; cv.style.width = size + 'px'; cv.style.height = size + 'px'; }
+    const sp = cv._sp || (cv._sp = dropSpec(p));
+    const ctx = cv.getContext('2d'); ctx.clearRect(0, 0, S, S);
+    const clar = cv._clar || sp.clar;
+    if (clar >= 3) { drawDrop(ctx, S, sp, t); return; }
+    // Out of focus: render small and scale up smoothly — a blur that works everywhere.
+    const n = Math.max(8, Math.round(S / (clar === 1 ? 9 : 3.2)));
+    OFF.width = n; OFF.height = n; const o = OFF.getContext('2d'); o.clearRect(0, 0, n, n); drawDrop(o, n, sp, t);
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high'; ctx.drawImage(OFF, 0, 0, n, n, 0, 0, S, S);
+  }
+  const REDUCED = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function loop(ms) { const t = REDUCED ? 1 : ms / 1000; document.querySelectorAll('canvas.drop').forEach(cv => paint(cv, t)); requestAnimationFrame(loop); }
+  const drop = (p, size) => '<canvas class="drop" data-pid="' + p.id + '" data-size="' + size + '" role="img" aria-label="' + esc(p.n) + '\'s glass portrait, ' + (p === ME ? 'clear' : CLARITY[clarity(p)].toLowerCase()) + '"></canvas>';
+  function focus(cv) { if (!cv || cv._busy) return; cv._busy = true; const real = dropSpec(P(cv.dataset.pid)).clar; let s = 1; cv._clar = 1; const step = () => { s++; if (s <= 3) { cv._clar = s; setTimeout(step, 700); } else setTimeout(() => { cv._clar = real; cv._busy = false; }, 1200); }; setTimeout(step, 700); }
+
+  /* ------------------------------------------------------------------
+   * State, history.
+   * ---------------------------------------------------------------- */
+  const S = { view: 'today', pid: null, tab: 'moments', sheet: null, ask: '', lens: null, game: { i: 0, picks: [] }, story: null };
+  const HIST = [{ view: 'today', pid: null, tab: 'moments' }];
+  let HI = 0, useHist = true;
+  try { history.replaceState({ hi: 0 }, ''); } catch (e) { useHist = false; }
+  function apply(s) { S.view = s.view; S.pid = s.pid; S.tab = s.tab; S.sheet = null; $('scroll').scrollTop = 0; render(); }
+  function go(next) {
+    const cur = HIST[HI], snap = { view: next.view, pid: next.pid !== undefined ? next.pid : S.pid, tab: next.tab || (next.view === S.view ? S.tab : 'moments') };
+    if (cur.view === snap.view && cur.pid === snap.pid && cur.tab === snap.tab) { S.sheet = null; render(); return; }
+    HIST.splice(HI + 1); HIST.push(snap); HI++;
+    if (useHist) { try { history.pushState({ hi: HI }, ''); } catch (e) { useHist = false; } }
+    apply(snap);
+  }
+  function back() { if (S.story) { S.story = null; renderLayer(); return; } if (S.sheet) { S.sheet = null; renderLayer(); return; } if (HI === 0) return; if (useHist) history.back(); else { HI--; apply(HIST[HI]); } }
+  function fwd() { if (HI >= HIST.length - 1) return; if (useHist) history.forward(); else { HI++; apply(HIST[HI]); } }
+  window.addEventListener('popstate', e => { const hi = e.state && typeof e.state.hi === 'number' ? e.state.hi : 0; if (hi >= 0 && hi < HIST.length) { HI = hi; apply(HIST[HI]); } });
+
+  /* ------------------------------------------------------------------
+   * Today.
+   * ---------------------------------------------------------------- */
+  function askPanel() {
+    const t = S.ask, pr = t.trim() ? parse(t) : {}, hits = CHECKS.filter(c => c.re.test(t)), blocked = hits.some(h => h.stop);
+    const tok = (k, v) => v ? '<span class="tok"><b>' + k + '</b>' + esc(v) + '</span>' : '';
+    const ready = t.trim().length > 3 && pr.who && !blocked;
+    return '<div class="col" id="askout">' +
+      (t.trim() ? '<div class="parsed">' + tok('who', pr.who && pr.who.n) + tok('moment', pr.moment) + tok('area', pr.area && AREAS[pr.area]) + tok('when', pr.when) + tok('where', pr.where) +
+        (!pr.who ? '<span class="faint">Who is this about? Try a name — Sam, Maya, Mum…</span>' : '') + '</div>' : '') +
+      hits.map(h => '<div class="guard' + (h.stop ? ' stop' : '') + '"><b>' + h.h + '</b>' + h.m + '</div>').join('') +
+      (t.trim() ? '<button class="btn" data-act="asksave"' + (ready ? '' : ' disabled') + '>Save to ' + (pr.who ? esc(pr.who.n) : '…') + '</button>' : '') +
+      '</div>';
+  }
+  function today() {
+    const lensDone = S.lens != null;
+    return '<header class="col-s"><span class="eyebrow">Thursday · Oct 8</span><h1 class="h-xl">What happened <em class="s">today?</em></h1></header>' +
+      '<div class="ask glass"><input id="askin" placeholder="e.g. Maya went quiet in standup" value="' + esc(S.ask) + '" autocomplete="off"><button class="mic" data-act="toast" data-msg="Voice notes work in the full app" aria-label="Speak instead"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button></div>' +
+      '<div class="pills" id="askchips">' + ['Sam went quiet after we argued', 'Maya asked for the headline at work', 'Mum cooked when I was ill', 'Dev reached out first'].map(s => '<button class="pill" data-act="askfill" data-v="' + esc(s) + '">' + esc(s) + '</button>').join('') + '</div>' +
+      askPanel() +
+
+      '<section class="card glass col">' +
+        '<div class="between"><span class="eyebrow">Your Lens · arrived 2:14 pm</span><span class="pill accent">about you</span></div>' +
+        '<h2 class="h-m">' + LENS.q + '</h2>' +
+        (lensDone
+          ? '<div class="col-s"><p class="sub">You said <b>' + LENS[S.lens] + '</b>. Friends who chose to share with you:</p><div class="list">' + LENS.shared.map(s => '<div class="row">' + drop(P(s.id), 34) + '<span class="grow">' + P(s.id).n + '</span><b>' + s.v + '</b></div>').join('') + '</div><p class="faint">A new Lens tomorrow, at a different time. No streaks.</p></div>'
+          : '<div class="grid2">' + ['a', 'b'].map(k => '<button class="btn-soft tap" data-act="lens" data-v="' + k + '" style="padding:20px 10px;font-size:1.05rem">' + LENS[k] + '</button>').join('') + '</div><p class="faint">Answer to see what friends shared with you.</p>') +
+      '</section>' +
+
+      '<section class="col"><div class="between"><h2 class="h-m">Your people</h2><button class="faint" data-nav="people">See all</button></div>' +
+        '<div class="orbit">' + PEOPLE.map(p => '<button data-act="open" data-pid="' + p.id + '">' + drop(p, 68) + '<span>' + esc(p.n) + '</span></button>').join('') +
+        '<button data-act="add"><span class="addcircle glass">+</span><span class="sub">Add</span></button></div></section>' +
+
+      '<button class="kind tap" data-act="tell" data-pid="sam" style="text-align:left;width:100%">' +
+        '<span class="eyebrow" style="color:#5a4a72">Tell them</span><p class="big">Noticed something good about Sam? Say it.</p>' +
+        '<span style="font-weight:700">Write a kind note →</span></button>' +
+
+      '<section class="card glass col">' +
+        '<div class="between"><span class="eyebrow">Check a hunch</span><span class="faint">Maya</span></div>' +
+        '<p class="h-m" style="font-weight:650">"In work updates, she wants the conclusion first." Seen twice, never asked.</p>' +
+        '<button class="btn-soft" data-act="open" data-pid="maya" data-tab="ask">Find out by asking</button>' +
+      '</section>' +
+
+      '<section class="card glass row" style="gap:16px">' +
+        '<div class="widget"><span style="font-size:0.7rem;font-weight:700;opacity:.85">PEOPLELENS</span><span style="font-family:var(--serif);font-size:1.25rem;line-height:1.05">Bad day. What do you want?</span><span style="font-size:0.7rem;opacity:.85">Tap to answer</span></div>' +
+        '<div class="col-s"><b>Put it on your Home Screen</b><p class="faint">Your Lens arrives as a widget. One tap, done.</p></div>' +
+      '</section>';
+  }
+
+  /* ------------------------------------------------------------------
+   * People and a person.
+   * ---------------------------------------------------------------- */
+  function people() {
+    return '<header class="col-s"><span class="eyebrow">' + PEOPLE.length + ' of 25 · only you can see these</span><h1 class="h-xl">People</h1></header>' +
+      '<div class="grid2">' + PEOPLE.map(p => '<button class="card glass tap col" style="align-items:center;text-align:center" data-act="open" data-pid="' + p.id + '">' + drop(p, 104) +
+        '<div class="col-s"><b style="font-size:1.1rem">' + esc(p.n) + '</b><span class="faint">' + esc(p.rel) + '</span></div><span class="pill' + (clarity(p) === 3 ? ' accent' : '') + '">' + CLARITY[clarity(p)] + '</span></button>').join('') +
+      '<button class="card glass tap col" style="align-items:center;justify-content:center;text-align:center" data-act="add"><span class="addcircle" style="border:1.5px dashed var(--faint)">+</span><b>Add someone</b><span class="faint">A first name is enough</span></button></div>';
+  }
+  function person() {
+    const p = P(S.pid), c = clarity(p), cnt = counts(p), need = c === 3 ? 0 : (c === 2 ? 4 : 2) - checks(p);
+    let body;
+    if (S.tab === 'moments') body = p.notes.length ? '<div class="card glass list">' + p.notes.map(n => '<div class="note"><span class="k' + (n.k === 'read' ? ' read' : '') + '">' + KIND[n.k] + '</span><div class="col-s"><p>' + esc(n.t) + '</p><span class="faint">' + n.w + ' · ' + AREAS[n.d] + '</span></div></div>').join('') + '</div>'
+      : '<div class="card glass col"><b>Nothing yet</b><p class="sub">What\'s one thing ' + esc(p.n) + ' did or said lately? Just type it on Today.</p></div>';
+    else if (S.tab === 'patterns') body = p.patterns.length ? p.patterns.map(x => '<div class="card glass col"><span class="pill' + (x.s === 'Checked twice' ? ' accent' : '') + '" style="align-self:flex-start">' + x.s + '</span><p class="h-m" style="font-weight:650">' + esc(x.t) + '</p><p class="faint">Or maybe: ' + esc(x.alt) + '</p></div>').join('')
+      : '<div class="card glass col"><b>No patterns yet</b><p class="sub">Notice the same thing twice and EVERY1 will suggest one — with another explanation beside it.</p></div>';
+    else body = (p.asks.length ? p.asks.map((a, i) => '<div class="card glass col"><span class="eyebrow">Only ' + esc(p.n) + ' knows</span><p class="h-m" style="font-weight:650">' + esc(a.q) + '</p><p class="sub" style="font-family:var(--serif);font-size:1.25rem;line-height:1.15">"' + esc(a.w) + '"</p><div class="row"><button class="btn" data-act="copy" data-i="' + i + '">Copy wording</button></div></div>').join('')
+      : '<div class="card glass col"><b>Nothing to ask yet</b><p class="sub">When a hunch is something only they could tell you, it lands here with gentle wording.</p></div>');
+    return '<header class="col" style="align-items:center;text-align:center;gap:8px">' +
+        '<button data-act="focus" aria-label="Watch the portrait come into focus">' + drop(p, 220).replace('class="drop"', 'class="drop" id="bigdrop"') + '</button>' +
+        '<h1 class="h-xl">' + esc(p.n) + '</h1><p class="sub">' + esc(p.rel) + (p.joined ? ' · in Mirror with you' : '') + '</p>' +
+        '<div class="pills" style="justify-content:center"><span class="pill' + (c === 3 ? ' accent' : '') + '">' + CLARITY[c] + '</span><span class="pill">🔒 Only you</span></div>' +
+        '<p class="faint" style="max-width:290px">' + (need > 0 ? need + ' more thing' + (need === 1 ? '' : 's') + ' they tell you, or that you try, will bring ' + esc(p.n) + ' into focus.' : 'In focus. You\'ve checked plenty with ' + esc(p.n) + ' directly.') + ' <button style="color:var(--accent);font-weight:650" data-act="focus">Watch</button></p>' +
+        '<div class="pills" style="justify-content:center">' + Object.keys(AREAS).map(k => '<span class="pill' + (cnt[k] ? '' : '') + '" style="' + (cnt[k] ? '' : 'opacity:.45') + '">' + AREAS[k] + (cnt[k] ? ' · ' + cnt[k] : '') + '</span>').join('') + '</div>' +
+      '</header>' +
+      '<div class="seg glass">' + [['moments', 'Moments'], ['patterns', 'Patterns'], ['ask', 'Ask']].map(([k, l]) => '<button data-act="tab" data-tab="' + k + '" aria-current="' + (S.tab === k) + '">' + l + '</button>').join('') + '</div>' +
+      body +
+      '<button class="kind tap" data-act="tell" data-pid="' + p.id + '" style="text-align:left;width:100%;padding:20px"><span class="eyebrow" style="color:#5a4a72">Tell them</span><b style="font-size:1.1rem">Something good you\'ve noticed about ' + esc(p.n) + '?</b></button>';
+  }
+
+  /* ------------------------------------------------------------------
+   * Mirror — sealed guesses.
+   * ---------------------------------------------------------------- */
+  function mirror() {
+    const g = S.game; if (g.i >= GAME.length) return reveal();
+    const c = GAME[g.i];
+    return '<header class="col-s"><span class="eyebrow">Mirror · with Sam · sealed 🔒</span><h1 class="h-l">How would Sam answer?</h1><p class="sub">He answered for himself. Nothing opens until you\'ve both finished.</p></header>' +
+      '<div class="dots">' + GAME.map((_, i) => '<i class="' + (i < g.i ? 'on' : '') + '"></i>').join('') + '</div>' +
+      '<article class="qcard glass" id="qcard"><span class="eyebrow">' + (g.i + 1) + ' / ' + GAME.length + '</span><h2>' + esc(c.q) + '</h2>' +
+        '<div class="col">' + ['a', 'b'].map(k => '<button class="opt glass" data-act="pick" data-v="' + k + '">' + esc(c[k]) + '<span class="faint">' + (k === 'a' ? '←' : '→') + '</span></button>').join('') + '</div></article>' +
+      '<p class="faint" style="text-align:center">Swipe or tap · there\'s no score</p>';
+  }
+  function reveal() {
+    const g = S.game, row = c => { const mine = g.picks[GAME.indexOf(c)]; return '<div class="col-s"><b>' + esc(c.q) + '</b><span class="sub">Sam: ' + esc(c[c.sam]) + (mine !== c.sam ? ' · <span class="faint">you guessed ' + esc(c[mine]) + '</span>' : '') + '</span></div>'; };
+    const clear = GAME.filter((c, i) => g.picks[i] === c.sam), miss = GAME.filter((c, i) => g.picks[i] !== c.sam);
+    return '<header class="col-s"><span class="eyebrow">Mirror · unsealed</span><h1 class="h-l">Here\'s what you <em class="s">each</em> said.</h1><p class="sub">No score. The surprises are the good part.</p></header>' +
+      (clear.length ? '<section class="card glass col"><span class="pill accent" style="align-self:flex-start">Saw it right</span><div class="list">' + clear.map(row).join('') + '</div></section>' : '') +
+      (miss.length ? '<section class="card glass col"><span class="pill" style="align-self:flex-start">Surprised you</span><div class="list">' + miss.map(row).join('') + '</div><p class="faint">Worth a chat: you guessed "' + esc(miss[0][g.picks[GAME.indexOf(miss[0])]]) + '", he said "' + esc(miss[0][miss[0].sam]) + '". Ask him about it.</p></section>' : '') +
+      '<button class="btn" data-act="duo">Make our card</button><button class="btn-soft" data-act="replay">Play again</button>';
+  }
+  function duoSheet() {
+    const g = S.game, areas = [...new Set(GAME.filter((c, i) => g.picks[i] === c.sam).map(c => c.area))].slice(0, 2);
+    return '<div class="grab"></div><div class="kind" style="align-items:center;text-align:center">' +
+      '<span class="eyebrow" style="color:#5a4a72">EVERY1 · Mirror</span>' +
+      '<div class="row" style="justify-content:center;gap:0">' + drop(ME, 96) + '<span style="margin:0 -10px;font-family:var(--serif);font-size:2rem;z-index:1">&amp;</span>' + drop(P('sam'), 96) + '</div>' +
+      '<p class="big">Alex &amp; Sam</p><b>' + (areas.length ? 'We read each other right on ' + areas.join(' and ') + '.' : 'We surprised each other.') + '</b>' +
+      '<span style="font-size:.8rem;opacity:.7">Both of us chose to play · no scores</span></div>' +
+      '<div class="col" style="margin-top:14px"><button class="btn" data-act="toast" data-msg="Card saved — share it anywhere">Share our card</button><p class="faint" style="text-align:center">Only this round, which you both played. Never your private notes.</p></div>';
+  }
+
+  /* ------------------------------------------------------------------
+   * You.
+   * ---------------------------------------------------------------- */
+  function you() {
+    return '<header class="col" style="align-items:center;text-align:center">' + drop(ME, 170) + '<h1 class="h-xl">Alex</h1><p class="sub">Your own portrait, from your own answers</p></header>' +
+      '<button class="card tap col" data-act="story" style="width:100%;color:#fff;background:linear-gradient(150deg,#4b33e8,#8b5cf6 55%,#ff8fb1);border:0">' +
+        '<span class="eyebrow" style="color:rgba(255,255,255,.75)">Your week · 4 stories</span><span style="font-family:var(--serif);font-size:2rem;line-height:1.05">You asked more than you assumed.</span><b>Watch →</b></button>' +
+      '<section class="card glass col"><span class="eyebrow">Your side</span><div class="list">' +
+        [['You want plans settled early.', 'From your answers · early signal'], ['After friction, you reach out first.', 'From 3 reflections'], ['It goes better with Maya when you lead with the conclusion.', 'From something you tried']].map(([t, s]) => '<div class="col-s"><b style="font-size:1.05rem">' + t + '</b><span class="faint">' + s + '</span></div>').join('') + '</div></section>' +
+      '<section class="card glass col"><span class="eyebrow">Privacy</span><div class="list">' +
+        [['Your notes', 'Encrypted. Only you. Never trains anything.'], ['No tracking', 'No locations, messages or screenshots of anyone.'], ['Kind notes', '"Tell them" only sends kind things, only to that person.'], ['Leave anytime', 'Delete a person, or everything, for good.']].map(([h, t]) => '<div class="between"><b>' + h + '</b><span class="faint" style="text-align:right;max-width:62%">' + t + '</span></div>').join('') + '</div></section>' +
+      '<p class="faint" style="text-align:center">No scores for people. No rankings. No diagnoses. No one under 18.</p>';
+  }
+  const STORIES = [
+    { bg: 'linear-gradient(160deg,#4b33e8,#8b5cf6)', html: '<span class="eyebrow" style="color:rgba(255,255,255,.75)">This week</span><span class="big">6</span><span class="ser">moments noticed.</span>' },
+    { bg: 'linear-gradient(160deg,#ff7a59,#ff4f8b)', html: '<span class="eyebrow" style="color:rgba(255,255,255,.75)">You asked</span><span class="big">2×</span><span class="ser">instead of assuming.</span><p>Maya told you how she likes updates. That\'s worth more than ten guesses.</p>' },
+    { bg: 'linear-gradient(160deg,#0f9b8e,#36d399)', html: '<span class="eyebrow" style="color:rgba(255,255,255,.75)">You changed your mind</span><span class="ser">"Mum doesn\'t care." → Retired.</span><p>Two hours of driving with soup said otherwise.</p>' },
+    { bg: 'linear-gradient(160deg,#1b1640,#4b33e8)', html: '<span class="eyebrow" style="color:rgba(255,255,255,.75)">Your lens this week</span><span class="ser">Hard days.</span><p>About you only — no names, nothing about anyone else.</p><button class="btn" style="background:#fff;color:#1b1640;margin-top:10px" data-act="toast" data-msg="Story saved — post it anywhere">Share my week</button>' }
+  ];
+  function storyLayer() {
+    const i = S.story.i, s = STORIES[i];
+    return '<div class="story" style="background:' + s.bg + '"><div class="bars">' + STORIES.map((_, k) => '<i class="' + (k < i ? 'done' : k === i ? 'now' : '') + '"><b></b></i>').join('') + '</div>' +
+      '<div class="between" style="margin-top:12px"><b>EVERY1</b><button data-act="storyclose" aria-label="Close" style="font-size:1.4rem;color:#fff">×</button></div>' +
+      '<div class="zones"><button data-act="storyprev" aria-label="Previous"></button><button data-act="storynext" aria-label="Next"></button></div>' +
+      '<div class="body" style="position:relative;z-index:2;pointer-events:none"><div class="col" style="pointer-events:auto">' + s.html + '</div></div></div>';
+  }
+
+  /* ------------------------------------------------------------------
+   * Sheets: Tell them, Add.
+   * ---------------------------------------------------------------- */
+  function tellSheet() {
+    const t = S.sheet, p = P(t.pid), bad = UNKIND.test(t.text), ok = t.text.trim().length > 6 && !bad;
+    if (t.sent) return '<div class="grab"></div><div class="col" style="align-items:center;text-align:center;padding:20px 0">' + drop(p, 120) + '<h2 class="h-l">Sent to ' + esc(p.n) + '.</h2><p class="sub">Only ' + esc(p.n) + ' sees it. If they\'re not on EVERY1 yet, they get a link — your note is the first thing they see.</p><button class="btn" data-act="close">Done</button></div>';
+    return '<div class="grab"></div><div class="col">' +
+      '<span class="eyebrow">Tell them · kind things only</span><h2 class="h-l">Something good you\'ve noticed?</h2>' +
+      '<div class="orbit" style="gap:10px">' + PEOPLE.map(x => '<button data-act="tellp" data-v="' + x.id + '" style="opacity:' + (x.id === p.id ? 1 : 0.45) + '">' + drop(x, 48) + '<span>' + esc(x.n) + '</span></button>').join('') + '</div>' +
+      '<div class="pills">' + KIND_STARTERS.map(s => '<button class="pill" data-act="tellfill" data-v="' + esc(s) + '">' + esc(s) + '</button>').join('') + '</div>' +
+      '<textarea class="field-in" id="tellin" placeholder="Be specific — a moment they\'ll recognise.">' + esc(t.text) + '</textarea>' +
+      (bad ? '<div class="guard stop"><b>Keep it kind</b>Tell them is only for appreciation. Hard things deserve a real conversation, not a card.</div>' : '') +
+      '<div class="kind"><span class="eyebrow" style="color:#5a4a72">Something I noticed about you, ' + esc(p.n) + '</span><p class="big">' + (t.text.trim() ? esc(t.text) : '…') + '</p><span style="font-weight:700">— Alex</span></div>' +
+      '<button class="btn" data-act="tellsend"' + (ok ? '' : ' disabled') + '>Send to ' + esc(p.n) + '</button></div>';
+  }
+  function addSheet() {
+    const a = S.add || (S.add = { n: '', rel: null, adult: null }), ok = a.n.trim() && a.rel && a.adult === 'yes';
+    return '<div class="grab"></div><div class="col"><h2 class="h-l">Add someone</h2>' +
+      '<input class="field-in" id="addn" maxlength="24" placeholder="First name or nickname" value="' + esc(a.n) + '">' +
+      '<span class="eyebrow">They\'re your</span><div class="pills">' + ['Friend', 'Partner', 'Family', 'Coworker', 'Manager', 'Ex'].map(r => '<button class="pill' + (a.rel === r ? ' on' : '') + '" data-act="addrel" data-v="' + r + '">' + r + '</button>').join('') + '</div>' +
+      '<span class="eyebrow">18 or older?</span><div class="pills"><button class="pill' + (a.adult === 'yes' ? ' on' : '') + '" data-act="addad" data-v="yes">Yes</button><button class="pill' + (a.adult === 'no' ? ' on' : '') + '" data-act="addad" data-v="no">No</button></div>' +
+      (a.adult === 'no' ? '<div class="guard stop"><b>Adults only</b>EVERY1 is built for understanding adults.</div>' : '') +
+      '<button class="btn" data-act="addgo"' + (ok ? '' : ' disabled') + '>Add</button></div>';
+  }
+
+  /* ------------------------------------------------------------------
+   * Render.
+   * ---------------------------------------------------------------- */
+  const VIEWS = { today, people, person, mirror, you };
+  const TITLES = { today: 'Today', people: 'People', mirror: 'Mirror', you: 'You' };
+  function render() {
+    $('view').innerHTML = VIEWS[S.view]();
+    document.querySelectorAll('#nav [data-nav]').forEach(b => { const on = b.dataset.nav === S.view || (S.view === 'person' && b.dataset.nav === 'people'); on ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'); });
+    renderLayer();
+    if (S.view === 'mirror' && S.game.i < GAME.length) bindSwipe();
+  }
+  function renderLayer() {
+    let html = '';
+    if (S.story) html = storyLayer();
+    else if (S.sheet) html = '<div class="sheet-back" data-act="close"></div><div class="sheet" role="dialog" aria-modal="true">' + ({ tell: tellSheet, add: addSheet, duo: duoSheet }[S.sheet.k])() + '</div>';
+    $('layer').innerHTML = html;
+    $('hback').disabled = HI === 0 && !S.sheet && !S.story; $('hfwd').disabled = HI >= HIST.length - 1;
+    $('httl').textContent = S.view === 'person' ? P(S.pid).n : TITLES[S.view];
+    if (S.story) { clearTimeout(S.story.tm); S.story.tm = setTimeout(() => storyStep(1), 4500); }
+  }
+  function storyStep(d) { if (!S.story) return; const i = S.story.i + d; if (i < 0) return; if (i >= STORIES.length) { S.story = null; renderLayer(); return; } S.story.i = i; renderLayer(); }
+  function toast(m) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = m; $('phone').appendChild(t); setTimeout(() => t.remove(), 2200); }
+  function bindSwipe() {
+    const el = $('qcard'); if (!el) return; let x0 = null, dx = 0;
+    el.addEventListener('pointerdown', e => { if (e.target.closest('button')) return; x0 = e.clientX; el.setPointerCapture(e.pointerId); el.style.transition = 'none'; });
+    el.addEventListener('pointermove', e => { if (x0 === null) return; dx = e.clientX - x0; el.style.transform = 'translateX(' + dx + 'px) rotate(' + dx / 20 + 'deg)'; });
+    const end = () => { if (x0 === null) return; el.style.transition = ''; if (Math.abs(dx) > 90) pick(dx < 0 ? 'a' : 'b'); else el.style.transform = ''; x0 = null; dx = 0; };
+    el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+  }
+  function pick(v) { const el = $('qcard'); S.game.picks[S.game.i] = v; if (el) { el.style.transform = 'translateX(' + (v === 'a' ? -460 : 460) + 'px) rotate(' + (v === 'a' ? -16 : 16) + 'deg)'; el.style.opacity = '0'; } setTimeout(() => { S.game.i++; render(); }, 240); }
+
+  document.addEventListener('input', e => {
+    if (e.target.id === 'askin') { S.ask = e.target.value; const box = $('askout'); if (box) box.outerHTML = askPanel(); }
+    if (e.target.id === 'tellin') { S.sheet.text = e.target.value; const pos = e.target.selectionStart; renderLayer(); const el = $('tellin'); if (el) { el.focus(); el.setSelectionRange(pos, pos); } }
+    if (e.target.id === 'addn') { S.add.n = e.target.value; const b = document.querySelector('[data-act="addgo"]'); if (b) b.disabled = !(S.add.n.trim() && S.add.rel && S.add.adult === 'yes'); }
+  });
+  document.addEventListener('click', e => {
+    const el = e.target.closest('[data-nav],[data-act]'); if (!el) return; const d = el.dataset;
+    if (d.nav) { go({ view: d.nav }); return; }
+    switch (d.act) {
+      case 'hback': back(); break;
+      case 'hfwd': fwd(); break;
+      case 'open': go({ view: 'person', pid: d.pid, tab: d.tab || 'moments' }); break;
+      case 'tab': go({ view: 'person', pid: S.pid, tab: d.tab }); break;
+      case 'focus': focus($('bigdrop')); break;
+      case 'askfill': S.ask = d.v; render(); break;
+      case 'asksave': { const pr = parse(S.ask); if (!pr.who) break;
+        const hearsay = CHECKS[2].re.test(S.ask);
+        if (hearsay) { pr.who.asks.push({ q: 'Is it true? "' + S.ask + '"', w: 'I\'d rather hear it from you than from anyone else — can I ask you something?' }); S.ask = ''; go({ view: 'person', pid: pr.who.id, tab: 'ask' }); toast('Saved as a question, not a fact'); break; }
+        pr.who.notes.unshift({ d: pr.area || 'comm', k: pr.kind || 'saw', t: S.ask.trim(), w: pr.when || 'Today' }); S.ask = ''; go({ view: 'person', pid: pr.who.id, tab: 'moments' }); toast('Saved to ' + pr.who.n); break; }
+      case 'lens': S.lens = d.v; render(); toast('Added to your side'); break;
+      case 'tell': S.sheet = { k: 'tell', pid: d.pid || (S.view === 'person' ? S.pid : 'sam'), text: '' }; renderLayer(); break;
+      case 'tellp': S.sheet.pid = d.v; renderLayer(); break;
+      case 'tellfill': S.sheet.text = d.v; renderLayer(); break;
+      case 'tellsend': S.sheet.sent = true; renderLayer(); break;
+      case 'add': S.add = null; S.sheet = { k: 'add' }; renderLayer(); break;
+      case 'addrel': S.add.rel = d.v; renderLayer(); break;
+      case 'addad': S.add.adult = d.v; renderLayer(); break;
+      case 'addgo': { const nm = S.add.n.trim().split(/\s+/)[0], id = 'p' + Date.now(); PEOPLE.push({ id, n: nm, rel: S.add.rel, notes: [], patterns: [], asks: [] }); S.sheet = null; go({ view: 'person', pid: id, tab: 'moments' }); toast(nm + ' starts hazy — check things to bring them into focus'); break; }
+      case 'pick': pick(d.v); break;
+      case 'replay': S.game = { i: 0, picks: [] }; render(); break;
+      case 'duo': S.sheet = { k: 'duo' }; renderLayer(); break;
+      case 'story': S.story = { i: 0 }; renderLayer(); break;
+      case 'storynext': storyStep(1); break;
+      case 'storyprev': storyStep(-1); break;
+      case 'storyclose': clearTimeout(S.story && S.story.tm); S.story = null; renderLayer(); break;
+      case 'close': S.sheet = null; renderLayer(); break;
+      case 'copy': { const w = P(S.pid).asks[+d.i].w; try { navigator.clipboard.writeText(w).then(() => toast('Copied — now ask in your own words'), () => toast('Copy the wording above')); } catch (er) { toast('Copy the wording above'); } break; }
+      case 'toast': toast(d.msg); break;
+    }
+  });
+
+  render();
+  requestAnimationFrame(loop);
+})();
+</script>
