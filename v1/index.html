@@ -157,6 +157,11 @@ p { margin: 0; }
 .note .em { width: 36px; height: 36px; border-radius: 12px; background: var(--card-hi); display: grid; place-items: center; font-size: 1.05rem; }
 .note + .note { border-top: 1px solid var(--line); padding-top: 12px; }
 .read { font-style: italic; color: var(--lilac); font-size: 0.9rem; }
+/* Rival explanations: every guess shows its doubt (overview §10 rule 2). */
+.rivals { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; padding-top: 10px; border-top: 1px dashed rgba(183, 156, 255, 0.35); }
+.rivals .eyebrow { color: #cdbbff; }
+.rival { padding: 8px 12px; border-radius: 14px; border: 1px dashed rgba(183, 156, 255, 0.45); background: rgba(183, 156, 255, 0.08); color: #e6dcff; font-size: 0.9rem; font-weight: 600; }
+.btn-danger { display: block; width: 100%; text-align: center; padding: 13px 18px; border-radius: 18px; font-weight: 700; background: rgba(255, 92, 154, 0.14); border: 1px solid rgba(255, 92, 154, 0.5); color: #ffc2d8; }
 
 .sticker { border-radius: 18px; padding: 12px 14px; font-weight: 600; font-size: 0.92rem; transform: rotate(-0.6deg); }
 .sticker.warn { background: rgba(255, 179, 92, 0.14); border: 1px solid rgba(255, 179, 92, 0.45); color: #ffd9a8; }
@@ -275,7 +280,8 @@ canvas.confetti { position: absolute; inset: 0; pointer-events: none; z-index: 5
         { d: 'social', s: 'shared', t: '"Small groups over big parties, always."', w: 'Round 2' },
         { d: 'space', s: 'said', t: 'Said Sunday mornings are his no-plans time.', w: 'Aug 30' }
       ],
-      pats: [{ d: 'support', b: 'working', t: 'Bad day → wants company, not conversation', why: '2 times · his own answer adds: alone time first' }],
+      pats: [{ d: 'support', b: 'working', t: 'Bad day → wants company, not conversation', why: '2 times · his own answer adds: alone time first',
+        alt: ['The walk was his alone time. You just happened to be there'] }],
       asks: []
     },
     { id: 'maya', n: 'Maya', ctx: 'Colleague', locked: true,
@@ -289,10 +295,14 @@ canvas.confetti { position: absolute; inset: 0; pointer-events: none; z-index: 5
         { d: 'feedback', s: 'saw', t: 'Looked awkward when the director thanked her in front of the team.', w: 'Sep 21' }
       ],
       pats: [
-        { d: 'comm', b: 'working', t: 'Work updates → headline first, details after', why: 'Seen 3 times · you tried it and it worked' },
-        { d: 'conflict', b: 'mixed', t: 'Disagrees later, one-to-one', why: '1 for · 1 that doesn\'t fit' },
-        { d: 'plans', b: 'hunch', t: 'Last-minute changes hit her hard', why: 'Just once so far' },
-        { d: 'feedback', b: 'hunch', t: 'Prefers private thanks over public shout-outs', why: 'Just once so far' }
+        { d: 'comm', b: 'working', t: 'Work updates → headline first, details after', why: 'Seen 3 times · you tried it and it worked',
+          alt: ['She was short on time that week', 'It\'s how her director runs meetings'] },
+        { d: 'conflict', b: 'mixed', t: 'Disagrees later, one-to-one', why: '1 for · 1 that doesn\'t fit',
+          alt: ['It depends on who\'s in the room, not on her'] },
+        { d: 'plans', b: 'hunch', t: 'Last-minute changes hit her hard', why: 'Just once so far',
+          alt: ['She went quiet because she was heads-down fixing it'] },
+        { d: 'feedback', b: 'hunch', t: 'Prefers private thanks over public shout-outs', why: 'Just once so far',
+          alt: ['It caught her off guard. Next time could be different', 'She didn\'t think the credit was hers alone'] }
       ],
       asks: [
         { q: 'How does she like hearing about changes?', msg: 'Hey, quick one: if plans change, do you want to hear straight away, or once it\'s settled?' },
@@ -306,7 +316,8 @@ canvas.confetti { position: absolute; inset: 0; pointer-events: none; z-index: 5
         { d: 'comm', s: 'tried', t: 'Just listened when she talked about the house. She thanked me twice.', w: 'Oct 4' },
         { d: 'social', s: 'saw', t: 'Calls every Sunday around seven.', w: 'Oct 4' }
       ],
-      pats: [{ d: 'comm', b: 'solid', t: 'Sharing a problem → wants listening first', why: 'Checked twice: she said it, and it worked' }],
+      pats: [{ d: 'comm', b: 'solid', t: 'Sharing a problem → wants listening first', why: 'Checked twice: she said it, and it worked',
+        alt: ['Some problems she would want help with. She\'d likely say so'] }],
       asks: []
     },
     { id: 'dev', n: 'Dev', ctx: 'Manager', locked: true, lopsided: true,
@@ -317,7 +328,8 @@ canvas.confetti { position: absolute; inset: 0; pointer-events: none; z-index: 5
         { d: 'feedback', s: 'saw', t: 'Got defensive when I raised the timeline in front of his boss.', w: 'Sep 22', bad: true },
         { d: 'comm', s: 'saw', t: 'Answered my chat message in two minutes.', w: 'Oct 5' }
       ],
-      pats: [{ d: 'comm', b: 'hunch', t: 'One-word reply = annoyed?', why: 'Once, and it\'s your read. Could just mean "yes".' }],
+      pats: [{ d: 'comm', b: 'hunch', t: 'One-word reply = annoyed?', why: 'Once, and it\'s your read',
+        alt: ['"ok" just meant yes', 'He read it on his phone between meetings'] }],
       asks: []
     }
   ];
@@ -627,9 +639,9 @@ canvas.confetti { position: absolute; inset: 0; pointer-events: none; z-index: 5
       '<div class="bento">' +
         '<div class="card aura-card wide col pop-in">' + drop + '</div>' +
         '<button class="card tap wide col pop-in" style="animation-delay:.05s" data-nav="guess">' +
-          '<div class="between"><span class="pill hot">🔥 New from Sam</span><span class="faint">5 cards · 60 sec</span></div>' +
+          '<div class="between"><span class="pill hot">✨ New from Sam</span><span class="faint">5 cards · 1 min</span></div>' +
           '<h2 style="font-size:1.6rem">Sam answered 5 questions about himself. <span class="grad-text">Can you guess them?</span></h2>' +
-          '<div class="row"><div style="flex:1;height:8px;border-radius:8px;background:var(--line);overflow:hidden"><div style="width:100%;height:100%;background:linear-gradient(90deg,var(--peach),var(--pink))"></div></div><span class="faint">his side done</span></div></button>' +
+          '<span class="faint">Play whenever you like. Nothing opens until you\'ve both answered.</span></button>' +
         '<button class="card tap col pop-in" style="animation-delay:.1s" data-act="prep">' +
           '<span style="font-size:1.8rem">🎯</span><b>Prep: project review</b><span class="faint">with Maya · tomorrow</span></button>' +
         '<button class="card tap col pop-in" style="animation-delay:.15s" data-act="invite">' +
@@ -703,7 +715,7 @@ canvas.confetti { position: absolute; inset: 0; pointer-events: none; z-index: 5
     }
     if (S.tab === 'vibes') {
       body = p.pats.map(x => '<div style="width:100%">' + patCard(x) + '</div>').join('') +
-        '<p class="faint">🌱 hunch → 🌿 getting there → 🌳 solid. Watching alone never gets you to solid. Only checking with them does.</p>';
+        '<p class="faint">🌱 hunch → 🌿 getting there → 🌳 solid. Every pattern keeps an "or maybe" next to it, even solid ones. Watching alone never gets you to solid. Only checking with them does.</p>';
     }
     if (S.tab === 'ask') {
       body = (p.stop ? '<div class="sticker cool">👀 You\'ve noticed about as much as you can from the outside. The rest only ' + esc(p.n) + ' can tell you.</div>' : '') +
@@ -718,7 +730,7 @@ canvas.confetti { position: absolute; inset: 0; pointer-events: none; z-index: 5
         '<div class="col-sm"><span class="faint">You noticed</span><p>👀 ' + esc(p.notes[0].t) + '</p></div>' +
         '<div class="col-sm"><span class="faint">Sam says</span><p>✨ ' + esc(p.notes[1].t) + '</p></div></div>' +
         '<p class="faint">Both stay as they are. Nobody "wins". The gap is the interesting part: maybe the walk was his alone time.</p></div>' +
-        '<button class="card tap col" data-nav="guess"><span class="pill hot">🔥 Round 4 ready</span><b style="font-size:1.1rem">Guess Sam\'s 5 answers</b><span class="faint">Nothing\'s revealed until you\'ve both played.</span></button>';
+        '<button class="card tap col" data-nav="guess"><span class="pill hot">✨ Round 4 ready</span><b style="font-size:1.1rem">Guess Sam\'s 5 answers</b><span class="faint">Nothing\'s revealed until you\'ve both played.</span></button>';
     }
 
     return '<div class="glow" style="top:-80px;left:0"></div>' +
@@ -733,7 +745,8 @@ canvas.confetti { position: absolute; inset: 0; pointer-events: none; z-index: 5
     const b = BAND[x.b];
     return '<div class="card col-sm" style="background:linear-gradient(160deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))">' +
       '<span class="pill' + (x.b === 'mixed' ? ' hot' : x.b === 'solid' ? ' mint' : '') + '" style="width:max-content">' + b.e + ' ' + b.l + '</span>' +
-      '<b style="font-family:var(--display);font-size:1.25rem;line-height:1.15">' + esc(x.t) + '</b><span class="faint">' + esc(x.why) + '</span></div>';
+      '<b style="font-family:var(--display);font-size:1.25rem;line-height:1.15">' + esc(x.t) + '</b><span class="faint">' + esc(x.why) + '</span>' +
+      (x.alt && x.alt.length ? '<div class="rivals"><span class="eyebrow">🌗 Or maybe…</span>' + x.alt.map(a => '<p class="rival">' + esc(a) + '</p>').join('') + '</div>' : '') + '</div>';
   }
   function noteRow(x) {
     return '<div class="note"><div class="em">' + SRC[x.s].e + '</div><div class="col-sm"><div class="row"><span class="faint">' + SRC[x.s].l + ' · ' + esc(x.w) + '</span>' +
@@ -785,7 +798,7 @@ canvas.confetti { position: absolute; inset: 0; pointer-events: none; z-index: 5
       '<div class="row" style="position:relative;gap:6px">' + ['alex', 'sam-self'].map(id => '<div style="width:74px;height:74px;border-radius:50%;background:#170f1e;display:grid;place-items:center;overflow:hidden"><canvas class="pcv" data-pid="' + id + '" data-size="70" aria-hidden="true"></canvas></div>').join('<b style="font-family:var(--display);font-size:1.6rem">×</b>') + '</div>' +
       '<div style="position:relative"><p style="font-weight:700;font-size:1.1rem">Alex × Sam</p><h2 style="font-size:2.1rem">' + (sync.length ? 'We read each other right on ' + esc(sync.join(' & ')) : 'We surprised each other') + '.</h2></div>' +
       '<div style="position:relative"><p style="font-weight:700;opacity:.75;font-size:.85rem">BIGGEST SURPRISE</p><p style="font-family:var(--display);font-weight:700;font-size:1.3rem;line-height:1.15">' +
-        (miss ? esc(miss.q.replace('…', '')) + ' → ' + miss[miss.sam][0] + ' ' + esc(miss[miss.sam][1]) : 'None. Scary accurate.') + '</p></div>' +
+        (miss ? esc(miss.q.replace('…', '')) + ' → ' + miss[miss.sam][0] + ' ' + esc(miss[miss.sam][1]) : 'None this round.') + '</p></div>' +
       '<p style="position:relative;font-weight:700">Both of us chose to play. No scores. 🔒</p></div>' +
       '<div class="col" style="margin-top:16px"><button class="btn" data-act="post">Share to story</button><button class="btn-ghost" data-act="copylink">Copy link</button>' +
       '<p class="faint" style="text-align:center">Shows only your round with Sam, which you both played, and characters made from each of your own answers. Never anything from your private notebooks.</p></div>';
@@ -912,7 +925,30 @@ canvas.confetti { position: absolute; inset: 0; pointer-events: none; z-index: 5
       row('🔕', 'Quiet notifications', 'Never show what\'s in a note', true) +
       '<div class="card col-sm"><b>Your notes about people</b><p class="muted">Only you see them. Never used to train AI or for research. That stays true even if you say yes, because the notes are about someone who hasn\'t agreed.</p></div>' +
       '<div class="sticker warn">⚖️ Private isn\'t the same as legally protected. A court could ask for your notes. Write what you\'d be OK with being read out loud.</div>' +
-      '<button class="btn-ghost" data-act="soon">Export my data</button><button class="btn-ghost" data-act="soon" style="color:var(--pink)">Delete everything</button></div>';
+      '<button class="btn-ghost" data-act="soon">Export my data</button><button class="btn-ghost" data-act="delall" style="color:var(--pink)">Delete everything</button></div>';
+  }
+
+  /* Delete everything: one honest confirm, no guilt copy (same wording in v1, v2, v3).
+     The prototype deletes nothing, so the test can carry on afterwards. */
+  function deleteSheet() {
+    const notes = PEOPLE.reduce((a, p) => a + p.notes.length, 0);
+    if (S.sheet.done) return '<div class="grab"></div><div class="col" style="text-align:center;align-items:center">' +
+      '<span style="font-size:2.4rem">🫧</span><h2 id="dlh" style="font-size:1.9rem" tabindex="-1">Deleted.</h2>' +
+      '<p class="muted">Your notebook is gone from the app. Our backups clear within 7 days.</p>' +
+      '<p class="faint">Prototype: nothing was actually deleted, so you can keep exploring.</p>' +
+      '<button class="btn" data-act="close">Close</button></div>';
+    const li = (e, t) => '<div class="row" style="align-items:flex-start"><span style="font-size:1.2rem;width:26px;text-align:center">' + e + '</span><p class="grow">' + t + '</p></div>';
+    return '<div class="grab"></div><div class="col">' +
+      '<h2 id="dlh" style="font-size:1.9rem" tabindex="-1">Delete everything?</h2>' +
+      '<p class="muted">This deletes your whole notebook: ' + PEOPLE.length + ' people, ' + notes + ' notes, their patterns and questions, every character, and your own answers.</p>' +
+      '<div class="card col">' +
+        li('⚡', 'Removed from the app <b>now</b>.') +
+        li('🗄️', 'Removed from our backups <b>within 7 days</b>.') +
+        li('↩️', 'It can\'t be undone. We can\'t get it back for you.') +
+        li('🔒', 'Rounds you played with Sam: your answers go. Sam keeps the answers he gave about himself.') + '</div>' +
+      '<button class="pill" data-act="soon" style="align-self:flex-start">Want a copy first? Export my data</button>' +
+      '<button class="btn-danger" data-act="delyes">Delete everything</button>' +
+      '<button class="btn-ghost" data-act="close">Keep my notebook</button></div>';
   }
 
   function addSheet() {
@@ -946,11 +982,12 @@ canvas.confetti { position: absolute; inset: 0; pointer-events: none; z-index: 5
     let html = '';
     if (!S.obDone) html = onboarding();
     else if (S.sheet) {
-      const body = { wrapped: wrappedSheet, note: noteSheet, prep: prepSheet, invite: inviteSheet, privacy: privacySheet, add: addSheet, share: shareSheet, legend: legendSheet }[S.sheet.k];
+      const body = { wrapped: wrappedSheet, note: noteSheet, prep: prepSheet, invite: inviteSheet, privacy: privacySheet, add: addSheet, share: shareSheet, legend: legendSheet, del: deleteSheet }[S.sheet.k];
       html = '<div class="sheet-back" data-act="close"></div><div class="sheet" role="dialog" aria-modal="true">' + (S.sheet.k === 'dom' ? domSheet(S.sheet.d) : body()) + '</div>';
     }
     $('layer').innerHTML = html;
     if ($('hback')) syncArrows();
+    if (S.sheet && S.sheet.k === 'del' && $('dlh')) $('dlh').focus();
   }
   /* Back / forward. Every screen change is an entry; the arrows and the
      phone's own back gesture both walk it. Sheets close before going back. */
@@ -1065,6 +1102,8 @@ canvas.confetti { position: absolute; inset: 0; pointer-events: none; z-index: 5
       case 'prep': sheet('prep'); break;
       case 'invite': sheet('invite'); break;
       case 'privacy': sheet('privacy'); break;
+      case 'delall': sheet('del'); break;
+      case 'delyes': S.sheet.done = true; renderLayer(); break;
       case 'wrapped': sheet('wrapped'); break;
       case 'add': S.add = null; sheet('add'); break;
       case 'dom': sheet('dom', { d: d.d }); break;
@@ -1080,7 +1119,7 @@ canvas.confetti { position: absolute; inset: 0; pointer-events: none; z-index: 5
       case 'replay': S.game = { i: 0, picks: [] }; render(); break;
       case 'share': sheet('share'); break;
       case 'post': toast('Card saved. Post it anywhere ✨'); break;
-      case 'copylink': copy('https://peoplelens.example/guess/alex', 'Link copied 🔗 Send it to a friend'); break;
+      case 'copylink': copy('https://every1.example/guess/alex', 'Link copied 🔗 Send it to a friend'); break;
       case 'myc': S.myCard[+d.i] = d.v; renderLayer(); break;
 
       case 'note': S.note = { pid: d.pid || (S.view === 'person' ? S.pid : 'maya'), t: '', r: '', where: null, who: null, how: null, m: null }; sheet('note'); break;

@@ -600,7 +600,7 @@ textarea.field { min-height: 90px; resize: none; line-height: 1.45; }
       '<section class="panel tap col" data-nav="mirror" role="button" tabindex="0" style="cursor:pointer">' +
         '<span class="label brass">The Mirror · sealed</span>' +
         '<p style="font-family:var(--display);font-size:1.5rem;font-weight:600;line-height:1.15">Sam has answered five questions about himself. Your guesses stay sealed until you finish.</p>' +
-        '<div class="seal">' + GAME.map(() => '<i class="on"></i>').join('') + '</div><span class="label">His half complete · yours waiting</span>' +
+        '<span class="label">Open it whenever you like</span>' +
       '</section>' +
 
       '<section class="col-s"><span class="label">This month</span>' +
@@ -723,8 +723,27 @@ textarea.field { min-height: 90px; resize: none; line-height: 1.45; }
         '<button class="panel tap col-s" data-act="review" style="width:100%"><p class="italic" style="font-family:var(--display);font-size:1.35rem">"You changed your mind once. That is the whole point."</p><span class="link">Read the review</span></button></section>' +
       '<section class="col"><div class="chapter"><span class="num">III</span><h2>Privacy</h2></div>' +
         '<div class="list">' + [['Your pages', 'Only you can read them. Encrypted, and never used to train anything — even if you agree to research.'], ['No surveillance', 'No locations, no messages, no screenshots of anyone else. Second-hand stories become questions.'], ['Leaving', 'Delete a portrait, or everything, at any time. It is gone for good.']].map(([h, t]) => '<div class="col-s"><span class="label brass">' + h + '</span><p class="small">' + t + '</p></div>').join('') + '</div>' +
-        '<button class="btn-line" data-act="toast" data-msg="Works in the full app">Export or delete everything</button></section>' +
+        '<div class="row" style="gap:10px"><button class="btn-line" style="flex:1" data-act="toast" data-msg="Works in the full app">Export my data</button><button class="btn-line" style="flex:1;border-color:var(--blood)" data-act="delall">Delete everything</button></div></section>' +
       '<section class="col-s"><span class="label">What EVERY1 will not do</span><p class="small muted">No scores or rankings of people. No diagnoses. No tracking. No notes about anyone under eighteen. No advice on how to manipulate anyone.</p></section>';
+  }
+  /* Delete everything: one honest confirm, no guilt copy (same wording in v1, v2, v3).
+     The prototype deletes nothing, so the test can carry on afterwards. */
+  function deleteSheet() {
+    const n = PEOPLE.reduce((a, p) => a + p.entries.length, 0);
+    if (S.sheet.done) return '<div class="grab"></div><div class="col" style="text-align:center;align-items:center">' +
+      '<span class="label brass">Notebook deleted</span><h2 id="dlh" class="display-l" tabindex="-1">Deleted.</h2>' +
+      '<p class="muted">Your notebook is gone from the app. Our backups clear within seven days.</p>' +
+      '<p class="small muted italic">Prototype: nothing was actually deleted, so you can keep exploring.</p>' +
+      '<button class="btn" data-act="close">Close</button></div>';
+    const li = (h, t) => '<div class="col-s"><span class="label brass">' + h + '</span><p class="small">' + t + '</p></div>';
+    return '<div class="grab"></div><div class="col"><span class="label brass">Leaving</span>' +
+      '<h2 id="dlh" class="display-l" tabindex="-1">Delete everything?</h2>' +
+      '<p class="muted">This deletes your whole notebook: ' + PEOPLE.length + ' portraits, ' + n + ' entries, their theories and open questions, and your own answers.</p>' +
+      '<div class="list">' + li('Now', 'Removed from the app straight away.') + li('Within seven days', 'Removed from our backups.') +
+        li('For good', 'It cannot be undone. We cannot recover it for you.') + li('The Mirror', 'Your answers go. Sam keeps the answers he gave about himself.') + '</div>' +
+      '<button class="link" data-act="toast" data-msg="Works in the full app" style="align-self:flex-start">Want a copy first? Export my data</button>' +
+      '<button class="btn-line" style="border-color:var(--blood)" data-act="delyes">Delete everything</button>' +
+      '<button class="btn" data-act="close">Keep my notebook</button></div>';
   }
   function reviewSheet() {
     const stat = (n, l) => '<div class="between" style="padding:10px 0;border-top:1px solid var(--rule)"><span>' + l + '</span><span style="font-family:var(--display);font-size:1.8rem;color:var(--brass);font-variant-numeric:tabular-nums">' + n + '</span></div>';
@@ -798,7 +817,7 @@ textarea.field { min-height: 90px; resize: none; line-height: 1.45; }
     if (!S.obDone) html = onboarding();
     else if (S.sheet) {
       const k = S.sheet.k;
-      const body = k === 'area' ? areaSheet(S.sheet.a) : { observe: observeSheet, add: addSheet, review: reviewSheet, certificate: certificateSheet }[k]();
+      const body = k === 'area' ? areaSheet(S.sheet.a) : { observe: observeSheet, add: addSheet, review: reviewSheet, certificate: certificateSheet, del: deleteSheet }[k]();
       html = '<div class="sheet-back" data-act="close"></div><div class="sheet" role="dialog" aria-modal="true">' + body + '</div>';
     }
     $('layer').innerHTML = html;
@@ -806,6 +825,7 @@ textarea.field { min-height: 90px; resize: none; line-height: 1.45; }
     $('hfwd').disabled = HI >= HIST.length - 1;
     $('httl').textContent = S.view === 'person' ? P(S.pid).n : TITLES[S.view];
     paintAll();
+    if (S.sheet && S.sheet.k === 'del' && $('dlh')) $('dlh').focus();
   }
   function sheet(k, extra) { S.sheet = Object.assign({ k }, extra || {}); renderLayer(); }
   function toast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; $('phone').appendChild(t); setTimeout(() => t.remove(), 2200); }
@@ -852,6 +872,8 @@ textarea.field { min-height: 90px; resize: none; line-height: 1.45; }
       case 'area': sheet('area', { a: d.a }); break;
       case 'add': S.add = null; sheet('add'); break;
       case 'review': sheet('review'); break;
+      case 'delall': sheet('del'); break;
+      case 'delyes': S.sheet.done = true; renderLayer(); break;
       case 'certificate': sheet('certificate'); break;
       case 'close': S.sheet = null; renderLayer(); break;
       case 'toast': toast(d.msg); break;

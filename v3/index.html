@@ -422,7 +422,7 @@ textarea.field-in { min-height: 96px; resize: none; }
       '</section>' +
 
       '<section class="card glass row" style="gap:16px">' +
-        '<div class="widget"><span style="font-size:0.7rem;font-weight:700;opacity:.85">PEOPLELENS</span><span style="font-family:var(--serif);font-size:1.25rem;line-height:1.05">Bad day. What do you want?</span><span style="font-size:0.7rem;opacity:.85">Tap to answer</span></div>' +
+        '<div class="widget"><span style="font-size:0.7rem;font-weight:700;opacity:.85">EVERY1</span><span style="font-family:var(--serif);font-size:1.25rem;line-height:1.05">Bad day. What do you want?</span><span style="font-size:0.7rem;opacity:.85">Tap to answer</span></div>' +
         '<div class="col-s"><b>Put it on your Home Screen</b><p class="faint">Your Lens arrives as a widget. One tap, done.</p></div>' +
       '</section>';
   }
@@ -441,7 +441,7 @@ textarea.field-in { min-height: 96px; resize: none; }
     let body;
     if (S.tab === 'moments') body = p.notes.length ? '<div class="card glass list">' + p.notes.map(n => '<div class="note"><span class="k' + (n.k === 'read' ? ' read' : '') + '">' + KIND[n.k] + '</span><div class="col-s"><p>' + esc(n.t) + '</p><span class="faint">' + n.w + ' · ' + AREAS[n.d] + '</span></div></div>').join('') + '</div>'
       : '<div class="card glass col"><b>Nothing yet</b><p class="sub">What\'s one thing ' + esc(p.n) + ' did or said lately? Just type it on Today.</p></div>';
-    else if (S.tab === 'patterns') body = p.patterns.length ? p.patterns.map(x => '<div class="card glass col"><span class="pill' + (x.s === 'Checked twice' ? ' accent' : '') + '" style="align-self:flex-start">' + x.s + '</span><p class="h-m" style="font-weight:650">' + esc(x.t) + '</p><p class="faint">Or maybe: ' + esc(x.alt) + '</p></div>').join('')
+    else if (S.tab === 'patterns') body = p.patterns.length ? p.patterns.map(x => '<div class="card glass col"><span class="pill' + (x.s === 'Checked twice' ? ' accent' : '') + '" style="align-self:flex-start">' + x.s + '</span><p class="h-m" style="font-weight:650">' + esc(x.t) + '</p><p class="sub" style="font-size:0.92rem"><b>Or maybe:</b> ' + esc(x.alt) + '</p></div>').join('')
       : '<div class="card glass col"><b>No patterns yet</b><p class="sub">Notice the same thing twice and EVERY1 will suggest one — with another explanation beside it.</p></div>';
     else body = (p.asks.length ? p.asks.map((a, i) => '<div class="card glass col"><span class="eyebrow">Only ' + esc(p.n) + ' knows</span><p class="h-m" style="font-weight:650">' + esc(a.q) + '</p><p class="sub" style="font-family:var(--serif);font-size:1.25rem;line-height:1.15">"' + esc(a.w) + '"</p><div class="row"><button class="btn" data-act="copy" data-i="' + i + '">Copy wording</button></div></div>').join('')
       : '<div class="card glass col"><b>Nothing to ask yet</b><p class="sub">When a hunch is something only they could tell you, it lands here with gentle wording.</p></div>');
@@ -498,6 +498,7 @@ textarea.field-in { min-height: 96px; resize: none; }
         [['You want plans settled early.', 'From your answers · early signal'], ['After friction, you reach out first.', 'From 3 reflections'], ['It goes better with Maya when you lead with the conclusion.', 'From something you tried']].map(([t, s]) => '<div class="col-s"><b style="font-size:1.05rem">' + t + '</b><span class="faint">' + s + '</span></div>').join('') + '</div></section>' +
       '<section class="card glass col"><span class="eyebrow">Privacy</span><div class="list">' +
         [['Your notes', 'Encrypted. Only you. Never trains anything.'], ['No tracking', 'No locations, messages or screenshots of anyone.'], ['Kind notes', '"Tell them" only sends kind things, only to that person.'], ['Leave anytime', 'Delete a person, or everything, for good.']].map(([h, t]) => '<div class="between"><b>' + h + '</b><span class="faint" style="text-align:right;max-width:62%">' + t + '</span></div>').join('') + '</div></section>' +
+      '<button class="card glass tap row" data-act="settings" style="width:100%"><span style="font-size:1.4rem" aria-hidden="true">⚙︎</span><div class="grow col-s"><b>Settings &amp; data</b><span class="faint">App lock, export, delete everything</span></div><span class="faint" aria-hidden="true">›</span></button>' +
       '<p class="faint" style="text-align:center">No scores for people. No rankings. No diagnoses. No one under 18.</p>';
   }
   const STORIES = [
@@ -529,6 +530,30 @@ textarea.field-in { min-height: 96px; resize: none; }
       '<div class="kind"><span class="eyebrow" style="color:#5a4a72">Something I noticed about you, ' + esc(p.n) + '</span><p class="big">' + (t.text.trim() ? esc(t.text) : '…') + '</p><span style="font-weight:700">— Alex</span></div>' +
       '<button class="btn" data-act="tellsend"' + (ok ? '' : ' disabled') + '>Send to ' + esc(p.n) + '</button></div>';
   }
+  function settingsSheet() {
+    const row = (h, t, on) => '<div class="between"><div class="col-s"><b>' + h + '</b><span class="faint">' + t + '</span></div><span class="pill' + (on ? ' accent' : '') + '">' + (on ? 'On' : 'Off') + '</span></div>';
+    return '<div class="grab"></div><div class="col"><span class="eyebrow">You</span><h2 class="h-l">Settings &amp; data</h2>' +
+      '<div class="card glass list" style="padding-block:4px">' + row('App lock', 'Face ID to open EVERY1', true) + row('Discreet mode', 'Shows up as "Notes"', false) + row('Quiet notifications', 'Never show what\'s in a note', true) + '</div>' +
+      '<button class="btn-soft" data-act="toast" data-msg="Works in the full app">Export my data</button>' +
+      '<button class="btn-soft" data-act="delall" style="color:var(--stop)">Delete everything</button></div>';
+  }
+  /* Delete everything: one honest confirm, no guilt copy (same wording in v1, v2, v3).
+     The prototype deletes nothing, so the test can carry on afterwards. */
+  function deleteSheet() {
+    const n = PEOPLE.reduce((a, p) => a + p.notes.length, 0);
+    if (S.sheet.done) return '<div class="grab"></div><div class="col" style="align-items:center;text-align:center;padding:12px 0">' +
+      '<h2 id="dlh" class="h-l" tabindex="-1">Deleted.</h2><p class="sub">Your notebook is gone from the app. Our backups clear within 7 days.</p>' +
+      '<p class="faint">Prototype: nothing was actually deleted, so you can keep exploring.</p><button class="btn" data-act="close">Close</button></div>';
+    const li = (h, t) => '<div class="col-s"><b>' + h + '</b><span class="sub">' + t + '</span></div>';
+    return '<div class="grab"></div><div class="col"><span class="eyebrow" style="color:var(--stop)">Leave</span>' +
+      '<h2 id="dlh" class="h-l" tabindex="-1">Delete <em class="s">everything?</em></h2>' +
+      '<p class="sub">This deletes your whole notebook: ' + PEOPLE.length + ' people, ' + n + ' moments, their patterns and questions, every portrait, and your own answers.</p>' +
+      '<div class="card glass list" style="padding-block:4px">' + li('Now', 'Removed from the app straight away.') + li('Within 7 days', 'Removed from our backups.') +
+        li('For good', 'It can\'t be undone. We can\'t get it back for you.') + li('Mirror', 'Your answers go. Sam keeps the answers he gave about himself.') + '</div>' +
+      '<button class="pill" data-act="toast" data-msg="Works in the full app" style="align-self:flex-start">Want a copy first? Export my data</button>' +
+      '<button class="btn" data-act="delyes" style="background:var(--stop);color:var(--accent-ink)">Delete everything</button>' +
+      '<button class="btn-soft" data-act="close">Keep my notebook</button></div>';
+  }
   function addSheet() {
     const a = S.add || (S.add = { n: '', rel: null, adult: null }), ok = a.n.trim() && a.rel && a.adult === 'yes';
     return '<div class="grab"></div><div class="col"><h2 class="h-l">Add someone</h2>' +
@@ -553,11 +578,12 @@ textarea.field-in { min-height: 96px; resize: none; }
   function renderLayer() {
     let html = '';
     if (S.story) html = storyLayer();
-    else if (S.sheet) html = '<div class="sheet-back" data-act="close"></div><div class="sheet" role="dialog" aria-modal="true">' + ({ tell: tellSheet, add: addSheet, duo: duoSheet }[S.sheet.k])() + '</div>';
+    else if (S.sheet) html = '<div class="sheet-back" data-act="close"></div><div class="sheet" role="dialog" aria-modal="true">' + ({ tell: tellSheet, add: addSheet, duo: duoSheet, settings: settingsSheet, del: deleteSheet }[S.sheet.k])() + '</div>';
     $('layer').innerHTML = html;
     $('hback').disabled = HI === 0 && !S.sheet && !S.story; $('hfwd').disabled = HI >= HIST.length - 1;
     $('httl').textContent = S.view === 'person' ? P(S.pid).n : TITLES[S.view];
     if (S.story) { clearTimeout(S.story.tm); S.story.tm = setTimeout(() => storyStep(1), 4500); }
+    if (S.sheet && S.sheet.k === 'del' && $('dlh')) $('dlh').focus();
   }
   function storyStep(d) { if (!S.story) return; const i = S.story.i + d; if (i < 0) return; if (i >= STORIES.length) { S.story = null; renderLayer(); return; } S.story.i = i; renderLayer(); }
   function toast(m) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = m; $('phone').appendChild(t); setTimeout(() => t.remove(), 2200); }
@@ -601,6 +627,9 @@ textarea.field-in { min-height: 96px; resize: none; }
       case 'pick': pick(d.v); break;
       case 'replay': S.game = { i: 0, picks: [] }; render(); break;
       case 'duo': S.sheet = { k: 'duo' }; renderLayer(); break;
+      case 'settings': S.sheet = { k: 'settings' }; renderLayer(); break;
+      case 'delall': S.sheet = { k: 'del' }; renderLayer(); break;
+      case 'delyes': S.sheet.done = true; renderLayer(); break;
       case 'story': S.story = { i: 0 }; renderLayer(); break;
       case 'storynext': storyStep(1); break;
       case 'storyprev': storyStep(-1); break;
